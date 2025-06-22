@@ -1,0 +1,9 @@
+name: FrostedNametags
+version: '${version}'
+main: io.github.pandier.frostednametags.FrostedNametags
+api-version: '1.21'
+load: STARTUP
+authors: [ Pandier ]
+depend:
+  - ProtocolLib
+  - PlaceholderAPI

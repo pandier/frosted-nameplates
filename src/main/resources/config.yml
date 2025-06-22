@@ -1,0 +1,4 @@
+
+# The customized nametag shown above the player's head.
+# Supports placeholders from PlaceholderAPI.
+nametag: '%player_name%'
