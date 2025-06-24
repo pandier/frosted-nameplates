@@ -1,0 +1,1 @@
+rootProject.name = "frosted-nameplates"
