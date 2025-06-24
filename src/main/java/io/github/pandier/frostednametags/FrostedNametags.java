@@ -20,9 +20,9 @@ import java.util.*;
 public final class FrostedNametags extends JavaPlugin implements Listener {
     private final FrostedNametagsConfig config = new FrostedNametagsConfig();
 
-    private final Map<ArmorStandNametag, List<UUID>> viewers = new HashMap<>();
-    private final Map<UUID, List<ArmorStandNametag>> viewed = new HashMap<>();
-    private final Map<Integer, ArmorStandNametag> nametags = new HashMap<>();
+    private final Map<Nametag, List<UUID>> viewers = new HashMap<>();
+    private final Map<UUID, List<Nametag>> viewed = new HashMap<>();
+    private final Map<Integer, Nametag> nametags = new HashMap<>();
 
     private ProtocolManager protocolManager;
 
@@ -60,21 +60,21 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
         return PlaceholderAPI.setPlaceholders(player, this.config.getNametag());
     }
 
-    @NotNull ArmorStandNametag getOrCreateNametag(@NotNull World world, int targetEntityId) {
+    @NotNull Nametag getOrCreateNametag(@NotNull World world, int targetEntityId) {
         return nametags.computeIfAbsent(targetEntityId, k -> {
-            final ArmorStandNametag nametag = new ArmorStandNametag(targetEntityId);
+            final Nametag nametag = new Nametag(targetEntityId);
             final Player player = getPlayerFromId(world, targetEntityId);
             if (player != null) nametag.setText(createNametagText(player));
             return nametag;
         });
     }
 
-    @Nullable ArmorStandNametag getNametag(int targetEntityId) {
+    @Nullable Nametag getNametag(int targetEntityId) {
         return nametags.get(targetEntityId);
     }
 
     void removeNametag(int targetEntityId) {
-        final ArmorStandNametag nametag = this.nametags.remove(targetEntityId);
+        final Nametag nametag = this.nametags.remove(targetEntityId);
         if (nametag == null) return;
         final List<UUID> viewers = this.viewers.remove(nametag);
         if (viewers != null) {
@@ -95,7 +95,7 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
 
     void updateNametag(@NotNull Player player) {
         final String text = createNametagText(player);
-        final ArmorStandNametag nametag = getNametag(player.getEntityId());
+        final Nametag nametag = getNametag(player.getEntityId());
         if (nametag == null) return;
         final List<UUID> viewers = this.viewers.get(nametag);
         if (viewers == null) return;
@@ -110,14 +110,14 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
     }
 
     void showNametag(@NotNull Player player, @NotNull PacketConsumer packetConsumer, int targetEntityId, @NotNull Vector3d position) {
-        final ArmorStandNametag nametag = getOrCreateNametag(player.getWorld(), targetEntityId);
+        final Nametag nametag = getOrCreateNametag(player.getWorld(), targetEntityId);
         this.viewers.computeIfAbsent(nametag, k -> new ArrayList<>()).add(player.getUniqueId());
         this.viewed.computeIfAbsent(player.getUniqueId(), k -> new ArrayList<>()).add(nametag);
         nametag.sendSpawnPackets(packetConsumer, position);
     }
 
     void hideNametag(@NotNull Player player, @NotNull PacketConsumer packetConsumer, int targetEntityId) {
-        final ArmorStandNametag nametag = getNametag(targetEntityId);
+        final Nametag nametag = getNametag(targetEntityId);
         if (nametag == null) return;
         this.viewers.getOrDefault(nametag, new ArrayList<>()).remove(player.getUniqueId());
         this.viewed.getOrDefault(player.getUniqueId(), new ArrayList<>()).remove(nametag);
@@ -125,9 +125,9 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
     }
 
     private void dispose(@NotNull Player player) {
-        final List<ArmorStandNametag> viewedNametags = this.viewed.remove(player.getUniqueId());
+        final List<Nametag> viewedNametags = this.viewed.remove(player.getUniqueId());
         if (viewedNametags != null) {
-            for (ArmorStandNametag nametag : viewedNametags) {
+            for (Nametag nametag : viewedNametags) {
                 this.viewers.getOrDefault(nametag, new ArrayList<>()).remove(player.getUniqueId());
             }
         }

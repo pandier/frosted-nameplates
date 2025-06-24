@@ -51,7 +51,7 @@ public final class FrostedNametagsPacketAdapters {
 
     private void onEntityMetadata(PacketEvent event, PacketContainer container) {
         final int entityId = container.getIntegers().read(0);
-        final ArmorStandNametag nametag = plugin.getNametag(entityId);
+        final Nametag nametag = plugin.getNametag(entityId);
         if (nametag == null) return;
         final List<WrappedDataValue> values = container.getDataValueCollectionModifier().read(0);
         final WrappedDataValue flagsData = values.stream().filter(value -> value.getIndex() == 0).findFirst().orElse(null);

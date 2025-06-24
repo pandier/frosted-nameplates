@@ -17,24 +17,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApiStatus.Internal
-public class ArmorStandNametag {
+public class Nametag {
     private static final int FLAGS_DATA_INDEX = 0;
     private static final int CUSTOM_NAME_DATA_INDEX = 2;
     private static final int CUSTOM_NAME_VISIBLE_DATA_INDEX = 3;
-    private static final int ARMOR_STAND_FLAGS_DATA_INDEX = 15;
+    private static final int TEXT_DISPLAY_BACKGROUND_DATA_INDEX = 25;
 
     private final int entityId;
     private final UUID uuid;
     private final int targetEntityId;
     private String text = ChatColor.RED + "N/A";
 
-    public ArmorStandNametag(int entityId, @NotNull UUID uuid, int targetEntityId) {
+    public Nametag(int entityId, @NotNull UUID uuid, int targetEntityId) {
         this.entityId = entityId;
         this.uuid = uuid;
         this.targetEntityId = targetEntityId;
     }
 
-    public ArmorStandNametag(int targetEntityId) {
+    public Nametag(int targetEntityId) {
         this(EntityUtil.generateEntityId(), UUID.randomUUID(), targetEntityId);
     }
 
@@ -44,12 +44,13 @@ public class ArmorStandNametag {
     }
 
     public void sendSpawnPackets(@NotNull PacketConsumer packetConsumer, @NotNull Vector3d position) {
-        packetConsumer.accept(PacketFactory.createSpawnEntityPacket(entityId, uuid, EntityType.ARMOR_STAND, position.add(0.0, 1.8, 0.0, new Vector3d())));
+        packetConsumer.accept(PacketFactory.createSpawnEntityPacket(entityId, uuid, EntityType.TEXT_DISPLAY, position.add(0.0, 1.8, 0.0, new Vector3d())));
         packetConsumer.accept(PacketFactory.createEntityMetadataPacket(entityId, new DataValueCollectionBuilder()
                 .add(FLAGS_DATA_INDEX, Byte.class, getFlags(false))
                 .add(CUSTOM_NAME_DATA_INDEX, WrappedDataWatcher.Registry.getChatComponentSerializer(true), Optional.of(WrappedChatComponent.fromLegacyText(text).getHandle()))
                 .add(CUSTOM_NAME_VISIBLE_DATA_INDEX, Boolean.class, true)
-                .add(ARMOR_STAND_FLAGS_DATA_INDEX, Byte.class, (byte) (1 << 4)))); // Marker flag
+                // Just setting the background color will make the text display not display anything, while still showing the custom name
+                .add(TEXT_DISPLAY_BACKGROUND_DATA_INDEX, Integer.class, 0)));
         packetConsumer.accept(PacketFactory.createSetPassengersPacket(targetEntityId, new int[] { entityId }));
     }
 
