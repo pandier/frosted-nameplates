@@ -8,7 +8,7 @@ load: STARTUP
 api-version: '1.19'
 
 depend:
-  - ProtocolLib
+  - packetevents
   - PlaceholderAPI
 
 commands:

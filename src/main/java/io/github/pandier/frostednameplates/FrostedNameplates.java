@@ -1,9 +1,10 @@
 package io.github.pandier.frostednameplates;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.utility.MinecraftVersion;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.util.Vector3d;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -15,7 +16,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
 
 import java.util.*;
 
@@ -23,36 +23,44 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     private static final String MINIMUM_MINECRAFT_VERSION = "1.19.4";
 
     private final FnpConfig config = new FnpConfig();
+    private final FnpPacketListener packetListener = new FnpPacketListener(this);
 
     private final Map<Nameplate, List<UUID>> viewers = new HashMap<>();
     private final Map<UUID, List<Nameplate>> viewed = new HashMap<>();
     private final Map<Integer, Nameplate> nameplates = new HashMap<>();
 
-    private ProtocolManager protocolManager;
     private @Nullable BukkitTask updateTask;
 
     @Override
     public void onLoad() {
-        this.protocolManager = ProtocolLibrary.getProtocolManager();
-
-        if (this.protocolManager == null)
-            throw new IllegalStateException("ProtocolLib has not been initialized yet");
-
         // Check the Minecraft version
-        final MinecraftVersion currentVersion = new MinecraftVersion(getServer());
-        if (currentVersion.compareTo(new MinecraftVersion(MINIMUM_MINECRAFT_VERSION)) < 0)
-            throw new IllegalStateException("FrostedNameplates requires Minecraft " + MINIMUM_MINECRAFT_VERSION + " or higher (current: " + currentVersion.getVersion() + ")");
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_19_4))
+            throw new IllegalStateException("FrostedNameplates requires Minecraft " + MINIMUM_MINECRAFT_VERSION + " or higher");
     }
 
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new FnpListener(this), this);
-        new FnpPacketAdapters(this).register(this.protocolManager);
+
+        PacketEvents.getAPI().getEventManager().registerListener(packetListener);
 
         saveDefaultConfig();
         reloadConfig();
 
         setupCommands();
+    }
+
+    @Override
+    public void onDisable() {
+        PacketEvents.getAPI().getEventManager().unregisterListener(packetListener);
+
+        for (Player player : getServer().getOnlinePlayers()) {
+            removeNameplate(player.getEntityId());
+        }
+
+        this.viewers.clear();
+        this.viewed.clear();
+        this.nameplates.clear();
     }
 
     @Override
@@ -91,7 +99,7 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
-        final Entity entity = protocolManager.getEntityFromID(world, playerId);
+        final Entity entity = SpigotConversionUtil.getEntityById(world, playerId);
         if (!(entity instanceof Player player)) return null;
         return player;
     }

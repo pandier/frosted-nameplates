@@ -1,16 +1,20 @@
 package io.github.pandier.frostednameplates;
 
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import io.github.pandier.frostednameplates.util.DataValueCollectionBuilder;
-import io.github.pandier.frostednameplates.util.EntityUtil;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
-import io.github.pandier.frostednameplates.util.PacketFactory;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +22,11 @@ import java.util.UUID;
 
 @ApiStatus.Internal
 public class Nameplate {
+    private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.builder()
+            .character(LegacyComponentSerializer.SECTION_CHAR)
+            .useUnusualXRepeatedCharacterHexFormat()
+            .build();
+
     private static final int FLAGS_DATA_INDEX = 0;
     private static final int CUSTOM_NAME_DATA_INDEX = 2;
     private static final int CUSTOM_NAME_VISIBLE_DATA_INDEX = 3;
@@ -26,16 +35,18 @@ public class Nameplate {
     private final int entityId;
     private final UUID uuid;
     private final int targetEntityId;
-    private String text = ChatColor.RED + "N/A";
+    private String text;
+    private Component textComponent;
 
     public Nameplate(int entityId, @NotNull UUID uuid, int targetEntityId) {
         this.entityId = entityId;
         this.uuid = uuid;
         this.targetEntityId = targetEntityId;
+        setText(ChatColor.RED + "N/A");
     }
 
     public Nameplate(int targetEntityId) {
-        this(EntityUtil.generateEntityId(), UUID.randomUUID(), targetEntityId);
+        this(SpigotReflectionUtil.generateEntityId(), UUID.randomUUID(), targetEntityId);
     }
 
     private byte getFlags(boolean sneaking) {
@@ -44,33 +55,37 @@ public class Nameplate {
     }
 
     public void sendSpawnPackets(@NotNull PacketConsumer packetConsumer, @NotNull Vector3d position) {
-        packetConsumer.accept(PacketFactory.createSpawnEntityPacket(entityId, uuid, EntityType.TEXT_DISPLAY, position.add(0.0, 1.8, 0.0, new Vector3d())));
-        packetConsumer.accept(PacketFactory.createEntityMetadataPacket(entityId, new DataValueCollectionBuilder()
-                .add(FLAGS_DATA_INDEX, Byte.class, getFlags(false))
-                .add(CUSTOM_NAME_DATA_INDEX, WrappedDataWatcher.Registry.getChatComponentSerializer(true), Optional.of(WrappedChatComponent.fromLegacyText(text).getHandle()))
-                .add(CUSTOM_NAME_VISIBLE_DATA_INDEX, Boolean.class, true)
+        packetConsumer.accept(new WrapperPlayServerSpawnEntity(entityId, Optional.of(uuid), EntityTypes.TEXT_DISPLAY, position.add(0.0, 1.8, 0.0), 0f, 0f, 0f, 0, Optional.of(new Vector3d())));
+        packetConsumer.accept(new WrapperPlayServerEntityMetadata(entityId, List.of(
+                new EntityData<>(FLAGS_DATA_INDEX, EntityDataTypes.BYTE, getFlags(false)),
+                new EntityData<>(CUSTOM_NAME_DATA_INDEX, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(this.textComponent)),
+                new EntityData<>(CUSTOM_NAME_VISIBLE_DATA_INDEX, EntityDataTypes.BOOLEAN, true),
                 // Just setting the background color will make the text display not display anything, while still showing the custom name
-                .add(TEXT_DISPLAY_BACKGROUND_DATA_INDEX, Integer.class, 0)));
-        packetConsumer.accept(PacketFactory.createSetPassengersPacket(targetEntityId, new int[] { entityId }));
+                new EntityData<>(TEXT_DISPLAY_BACKGROUND_DATA_INDEX, EntityDataTypes.INT, 0)
+        )));
+        packetConsumer.accept(new WrapperPlayServerSetPassengers(targetEntityId, new int[] { entityId }));
     }
 
     public void sendUpdatePackets(@NotNull PacketConsumer packetConsumer) {
-        packetConsumer.accept(PacketFactory.createEntityMetadataPacket(entityId, new DataValueCollectionBuilder()
-                .add(CUSTOM_NAME_DATA_INDEX, WrappedDataWatcher.Registry.getChatComponentSerializer(true), Optional.of(WrappedChatComponent.fromLegacyText(text).getHandle()))));
+        packetConsumer.accept(new WrapperPlayServerEntityMetadata(entityId, List.of(
+                new EntityData<>(CUSTOM_NAME_DATA_INDEX, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(this.textComponent))
+        )));
     }
 
     public void sendStatusPackets(@NotNull PacketConsumer packetConsumer, boolean sneaking, boolean invisible) {
-        packetConsumer.accept(PacketFactory.createEntityMetadataPacket(entityId, new DataValueCollectionBuilder()
-                .add(FLAGS_DATA_INDEX, Byte.class, getFlags(sneaking))
-                .add(CUSTOM_NAME_VISIBLE_DATA_INDEX, Boolean.class, !invisible)));
+        packetConsumer.accept(new WrapperPlayServerEntityMetadata(entityId, List.of(
+                new EntityData<>(FLAGS_DATA_INDEX, EntityDataTypes.BYTE, getFlags(sneaking)),
+                new EntityData<>(CUSTOM_NAME_VISIBLE_DATA_INDEX, EntityDataTypes.BOOLEAN, !invisible)
+        )));
     }
 
     public void sendRemovePackets(@NotNull PacketConsumer packetConsumer) {
-        packetConsumer.accept(PacketFactory.createEntityDestroyPacket(List.of(entityId)));
+        packetConsumer.accept(new WrapperPlayServerDestroyEntities(entityId));
     }
 
     public void setText(@NotNull String text) {
         this.text = text;
+        this.textComponent = LEGACY_SERIALIZER.deserialize(text);
     }
 
     @NotNull

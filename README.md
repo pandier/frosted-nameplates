@@ -3,7 +3,7 @@
 > [!NOTE]
 > 🚧 Frosted Nameplates is currently in alpha. Expect bugs or other issues.
 
-**Requires [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) and [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**\
+**Requires [PacketEvents](https://modrinth.com/plugin/packetevents) and [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**\
 **Supported versions:** 1.19.4 and above (tested on 1.21.4)
 
 **Frosted Nameplates** is a [Spigot](https://www.spigotmc.org/) plugin that allows you to fully modify the text shown above the player's head,

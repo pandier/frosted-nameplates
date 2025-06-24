@@ -16,13 +16,13 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
-    maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.extendedclip.com/releases/")
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.8.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
