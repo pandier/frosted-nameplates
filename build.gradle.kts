@@ -1,6 +1,7 @@
 plugins {
     java
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("org.jetbrains.changelog") version "2.2.1"
 }
 
 val buildNumber = project.findProperty("buildNumber")
@@ -51,4 +52,9 @@ tasks {
             expand("version" to project.version)
         }
     }
+}
+
+changelog {
+    groups.empty()
+    repositoryUrl.set(providers.gradleProperty("repository"))
 }
