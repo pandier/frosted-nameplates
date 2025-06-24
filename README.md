@@ -49,4 +49,4 @@ Report it in the [GitHub issue tracker](https://github.com/pandier/frosted-namep
 
 ## 📜 License
 
-The content of this repository is licensed under the MIT license.
+The content of this repository is licensed under the [MIT license](https://github.com/pandier/frosted-nameplates/blob/main/LICENSE).
