@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
-public class FrostedNameplatesConfig {
+public class FnpConfig {
     private String nameplate;
     private int updateInterval;
 

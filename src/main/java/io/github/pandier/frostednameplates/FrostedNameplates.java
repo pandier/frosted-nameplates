@@ -8,9 +8,7 @@ import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +18,7 @@ import org.joml.Vector3d;
 import java.util.*;
 
 public final class FrostedNameplates extends JavaPlugin implements Listener {
-    private final FrostedNameplatesConfig config = new FrostedNameplatesConfig();
+    private final FnpConfig config = new FnpConfig();
 
     private final Map<Nameplate, List<UUID>> viewers = new HashMap<>();
     private final Map<UUID, List<Nameplate>> viewed = new HashMap<>();
@@ -31,10 +29,10 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(this, this);
-
         this.protocolManager = ProtocolLibrary.getProtocolManager();
-        new FrostedNameplatesPacketAdapters(this, this.protocolManager);
+
+        getServer().getPluginManager().registerEvents(new FnpListener(this), this);
+        new FnpPacketAdapters(this).register(this.protocolManager);
 
         saveDefaultConfig();
         reloadConfig();
@@ -67,19 +65,19 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     private void setupCommands() {
         final PluginCommand command = getCommand("frostednameplates");
         if (command == null) throw new IllegalStateException("Missing command 'frostednameplates'");
-        final FrostedNameplatesCommand instance = new FrostedNameplatesCommand(this);
+        final FnpCommand instance = new FnpCommand(this);
         command.setExecutor(instance);
         command.setTabCompleter(instance);
+    }
+
+    private @NotNull String createNameplateText(@NotNull Player player) {
+        return PlaceholderAPI.setPlaceholders(player, this.config.getNameplate());
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
         final Entity entity = protocolManager.getEntityFromID(world, playerId);
         if (!(entity instanceof Player player)) return null;
         return player;
-    }
-
-    private @NotNull String createNameplateText(@NotNull Player player) {
-        return PlaceholderAPI.setPlaceholders(player, this.config.getNameplate());
     }
 
     @NotNull Nameplate getOrCreateNameplate(@NotNull World world, int targetEntityId) {
@@ -146,7 +144,7 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         nameplate.sendRemovePackets(packetConsumer);
     }
 
-    private void dispose(@NotNull Player player) {
+    void dispose(@NotNull Player player) {
         final List<Nameplate> viewedNameplates = this.viewed.remove(player.getUniqueId());
         if (viewedNameplates != null) {
             for (Nameplate nameplate : viewedNameplates) {
@@ -154,10 +152,5 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
             }
         }
         removeNameplate(player.getEntityId());
-    }
-
-    @EventHandler
-    private void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-        dispose(event.getPlayer());
     }
 }

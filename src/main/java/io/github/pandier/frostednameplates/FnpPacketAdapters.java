@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 @ApiStatus.Internal
-public final class FrostedNameplatesPacketAdapters {
+public final class FnpPacketAdapters {
     private final FrostedNameplates plugin;
 
-    public FrostedNameplatesPacketAdapters(@NotNull FrostedNameplates plugin, @NotNull ProtocolManager protocolManager) {
+    public FnpPacketAdapters(@NotNull FrostedNameplates plugin) {
         this.plugin = plugin;
+    }
 
+    public void register(@NotNull ProtocolManager protocolManager) {
         listenOutgoing(protocolManager, PacketType.Play.Server.SPAWN_ENTITY, this::onSpawnEntity);
         listenOutgoing(protocolManager, PacketType.Play.Server.ENTITY_METADATA, this::onEntityMetadata);
         listenOutgoing(protocolManager, PacketType.Play.Server.ENTITY_DESTROY, this::onDestroyEntities);
