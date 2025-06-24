@@ -60,7 +60,8 @@ public final class FnpPacketAdapters {
         if (flagsData == null) return;
         final byte flags = (byte) flagsData.getValue();
         boolean sneaking = (flags & 2) != 0;
-        nameplate.sendSneakingPackets(PacketConsumer.scheduled(event), sneaking);
+        boolean invisible = (flags & 32) != 0;
+        nameplate.sendStatusPackets(PacketConsumer.scheduled(event), sneaking, invisible);
     }
 
     private void onDestroyEntities(PacketEvent event, PacketContainer container) {

@@ -59,9 +59,10 @@ public class Nameplate {
                 .add(CUSTOM_NAME_DATA_INDEX, WrappedDataWatcher.Registry.getChatComponentSerializer(true), Optional.of(WrappedChatComponent.fromLegacyText(text).getHandle()))));
     }
 
-    public void sendSneakingPackets(@NotNull PacketConsumer packetConsumer, boolean sneaking) {
+    public void sendStatusPackets(@NotNull PacketConsumer packetConsumer, boolean sneaking, boolean invisible) {
         packetConsumer.accept(PacketFactory.createEntityMetadataPacket(entityId, new DataValueCollectionBuilder()
-                .add(FLAGS_DATA_INDEX, Byte.class, getFlags(sneaking))));
+                .add(FLAGS_DATA_INDEX, Byte.class, getFlags(sneaking))
+                .add(CUSTOM_NAME_VISIBLE_DATA_INDEX, Boolean.class, !invisible)));
     }
 
     public void sendRemovePackets(@NotNull PacketConsumer packetConsumer) {
