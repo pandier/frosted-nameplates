@@ -47,7 +47,11 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
     public void reloadConfig() {
         super.reloadConfig();
         this.config.load(getConfig());
+
         restartUpdateTask();
+
+        // Update all nametags immediately
+        getServer().getScheduler().runTask(this, this::updateNametags);
     }
 
     private void restartUpdateTask() {
