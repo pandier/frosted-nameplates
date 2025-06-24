@@ -10,7 +10,7 @@ public class FrostedNametagsConfig {
 
     public void load(@NotNull FileConfiguration config) {
         nametag = ChatColor.translateAlternateColorCodes('&', config.getString("nametag", "%player_name%"));
-        updateInterval = config.getInt("update-interval", 100);
+        updateInterval = config.getInt("update-interval", 20);
     }
 
     @NotNull

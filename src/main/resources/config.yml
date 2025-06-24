@@ -9,5 +9,5 @@ nametag: '%player_name%'
 # Anything below 1 will turn off updates completely.
 # 20 ticks = 1 second
 #
-# Default: 100
-update-interval: 100
+# Default: 20
+update-interval: 20
