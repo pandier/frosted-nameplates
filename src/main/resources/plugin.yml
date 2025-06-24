@@ -7,3 +7,15 @@ authors: [ Pandier ]
 depend:
   - ProtocolLib
   - PlaceholderAPI
+commands:
+  frostednametags:
+    aliases: [fnt]
+    permission: frostednametags.command
+permissions:
+  frostednametags.command:
+    description: Allows you to use the /frostednametags command
+    default: op
+  frostednametags.*:
+    default: op
+    children:
+      frostednametags.command: true

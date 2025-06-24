@@ -4,7 +4,9 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import io.github.pandier.frostednametags.util.PacketConsumer;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,6 +39,8 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
 
         saveDefaultConfig();
         reloadConfig();
+
+        setupCommands();
     }
 
     @Override
@@ -55,6 +59,14 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
         if (updateInterval > 0) {
             this.updateTask = getServer().getScheduler().runTaskTimer(this, this::updateNametags, updateInterval, updateInterval);
         }
+    }
+
+    private void setupCommands() {
+        final PluginCommand command = getCommand("frostednametags");
+        if (command == null) throw new IllegalStateException("Missing command 'frostednametags'");
+        final FrostedNametagsCommand instance = new FrostedNametagsCommand(this);
+        command.setExecutor(instance);
+        command.setTabCompleter(instance);
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
@@ -101,11 +113,11 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
     }
 
     void updateNametag(@NotNull Player player) {
-        final String text = createNametagText(player);
         final Nametag nametag = getNametag(player.getEntityId());
         if (nametag == null) return;
         final List<UUID> viewers = this.viewers.get(nametag);
-        if (viewers == null) return;
+        if (viewers == null || viewers.isEmpty()) return;
+        final String text = createNametagText(player);
         viewers.removeIf(viewerUuid -> {
             final Player viewer = getServer().getPlayer(viewerUuid);
             if (viewer == null) return true;
