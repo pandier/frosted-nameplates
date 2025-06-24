@@ -6,7 +6,7 @@
 nameplate: '%player_name%'
 
 # The interval in ticks between nameplate updates.
-# Anything below 1 will turn off updates completely.
+# Anything below 1 will turn off automatic updates completely.
 # 20 ticks = 1 second
 #
 # Default: 20

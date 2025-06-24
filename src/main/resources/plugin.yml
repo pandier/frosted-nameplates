@@ -1,16 +1,21 @@
 name: FrostedNameplates
-version: '${version}'
+version: ${version}
+description: Allows customizing the text above players' heads
+authors: [Pandier]
+
 main: io.github.pandier.frostednameplates.FrostedNameplates
-api-version: '1.21'
 load: STARTUP
-authors: [ Pandier ]
+api-version: '1.19'
+
 depend:
   - ProtocolLib
   - PlaceholderAPI
+
 commands:
   frostednameplates:
     aliases: [fnp]
     permission: frostednameplates.command
+
 permissions:
   frostednameplates.command:
     description: Allows you to use the /frostednameplates command

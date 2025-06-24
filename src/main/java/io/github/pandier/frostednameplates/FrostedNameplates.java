@@ -2,6 +2,7 @@ package io.github.pandier.frostednameplates;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.utility.MinecraftVersion;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
@@ -19,6 +20,8 @@ import org.joml.Vector3d;
 import java.util.*;
 
 public final class FrostedNameplates extends JavaPlugin implements Listener {
+    private static final String MINIMUM_MINECRAFT_VERSION = "1.19.4";
+
     private final FnpConfig config = new FnpConfig();
 
     private final Map<Nameplate, List<UUID>> viewers = new HashMap<>();
@@ -29,9 +32,20 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     private @Nullable BukkitTask updateTask;
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
 
+        if (this.protocolManager == null)
+            throw new IllegalStateException("ProtocolLib has not been initialized yet");
+
+        // Check the Minecraft version
+        final MinecraftVersion currentVersion = new MinecraftVersion(getServer());
+        if (currentVersion.compareTo(new MinecraftVersion(MINIMUM_MINECRAFT_VERSION)) < 0)
+            throw new IllegalStateException("FrostedNameplates requires Minecraft " + MINIMUM_MINECRAFT_VERSION + " or higher (current: " + currentVersion.getVersion() + ")");
+    }
+
+    @Override
+    public void onEnable() {
         getServer().getPluginManager().registerEvents(new FnpListener(this), this);
         new FnpPacketAdapters(this).register(this.protocolManager);
 

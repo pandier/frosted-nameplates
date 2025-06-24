@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
 }
@@ -33,13 +33,17 @@ tasks {
     }
 }
 
+def targetJavaVersion = 17
+
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    if (JavaVersion.current() < JavaVersion.toVersion(targetJavaVersion)) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release.set(21)
+    options.release.set(targetJavaVersion)
 }
 
 processResources {
