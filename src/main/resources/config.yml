@@ -1,4 +1,13 @@
 
 # The customized nametag shown above the player's head.
 # Supports placeholders from PlaceholderAPI.
+#
+# Default: '%player_name%'
 nametag: '%player_name%'
+
+# The interval in ticks between nametag updates.
+# Anything below 1 will turn off updates completely.
+# 20 ticks = 1 second
+#
+# Default: 100
+update-interval: 100

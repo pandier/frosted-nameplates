@@ -6,13 +6,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class FrostedNametagsConfig {
     private String nametag;
+    private int updateInterval;
 
     public void load(@NotNull FileConfiguration config) {
         nametag = ChatColor.translateAlternateColorCodes('&', config.getString("nametag", "%player_name%"));
+        updateInterval = config.getInt("update-interval", 100);
     }
 
     @NotNull
     public String getNametag() {
         return nametag;
+    }
+
+    public int getUpdateInterval() {
+        return updateInterval;
     }
 }

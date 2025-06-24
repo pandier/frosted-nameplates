@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
@@ -25,29 +26,35 @@ public final class FrostedNametags extends JavaPlugin implements Listener {
     private final Map<Integer, Nametag> nametags = new HashMap<>();
 
     private ProtocolManager protocolManager;
+    private @Nullable BukkitTask updateTask;
 
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
 
-        saveDefaultConfig();
-        reloadConfig();
-
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         new FrostedNametagsPacketAdapters(this, this.protocolManager);
 
-        // TODO: Ability to configure this
-        getServer().getScheduler().runTaskTimer(this, this::updateNametags, 100, 100);
-    }
-
-    @Override
-    public void onDisable() {
+        saveDefaultConfig();
+        reloadConfig();
     }
 
     @Override
     public void reloadConfig() {
         super.reloadConfig();
         this.config.load(getConfig());
+        restartUpdateTask();
+    }
+
+    private void restartUpdateTask() {
+        if (this.updateTask != null) {
+            this.updateTask.cancel();
+            this.updateTask = null;
+        }
+        final int updateInterval = this.config.getUpdateInterval();
+        if (updateInterval > 0) {
+            this.updateTask = getServer().getScheduler().runTaskTimer(this, this::updateNametags, updateInterval, updateInterval);
+        }
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
