@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
@@ -71,7 +72,8 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     }
 
     private @NotNull String createNameplateText(@NotNull Player player) {
-        return PlaceholderAPI.setPlaceholders(player, this.config.getNameplate());
+        final String text = PlaceholderAPI.setPlaceholders(player, this.config.getNameplate());
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
