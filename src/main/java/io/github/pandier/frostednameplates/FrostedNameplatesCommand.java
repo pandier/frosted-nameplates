@@ -1,6 +1,6 @@
-package io.github.pandier.frostednametags;
+package io.github.pandier.frostednameplates;
 
-import io.github.pandier.frostednametags.util.TextUtil;
+import io.github.pandier.frostednameplates.util.TextUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,15 +13,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
-public class FrostedNametagsCommand implements CommandExecutor, TabCompleter {
+public class FrostedNameplatesCommand implements CommandExecutor, TabCompleter {
     private static final String PRIMARY_COLOR = TextUtil.colorHex("5f9fe8");
     private static final String SECONDARY_COLOR = TextUtil.colorHex("1c70ed");
     private static final String ICON = "❄";
     private static final String INFO_PREFIX = PRIMARY_COLOR;
 
-    private final FrostedNametags plugin;
+    private final FrostedNameplates plugin;
 
-    public FrostedNametagsCommand(@NotNull FrostedNametags plugin) {
+    public FrostedNameplatesCommand(@NotNull FrostedNameplates plugin) {
         this.plugin = plugin;
     }
 
@@ -54,7 +54,7 @@ public class FrostedNametagsCommand implements CommandExecutor, TabCompleter {
 
     private void help(@NotNull CommandSender sender, @NotNull String label) {
         final String message = "\n " +
-                PRIMARY_COLOR + ICON + " Frosted " + SECONDARY_COLOR + "Nametags " + ChatColor.GRAY + "v" + plugin.getDescription().getVersion() +
+                PRIMARY_COLOR + ICON + " Frosted " + SECONDARY_COLOR + "Nameplates " + ChatColor.GRAY + "v" + plugin.getDescription().getVersion() +
                 "\n by " + String.join(", ", plugin.getDescription().getAuthors()) + "\n " +
                 PRIMARY_COLOR + "\n /" + label + " reload" + ChatColor.GRAY + " - Reloads the plugin's configuration" +
                 "\n ";

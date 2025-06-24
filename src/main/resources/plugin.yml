@@ -1,6 +1,6 @@
-name: FrostedNametags
+name: FrostedNameplates
 version: '${version}'
-main: io.github.pandier.frostednametags.FrostedNametags
+main: io.github.pandier.frostednameplates.FrostedNameplates
 api-version: '1.21'
 load: STARTUP
 authors: [ Pandier ]
@@ -8,14 +8,14 @@ depend:
   - ProtocolLib
   - PlaceholderAPI
 commands:
-  frostednametags:
-    aliases: [fnt]
-    permission: frostednametags.command
+  frostednameplates:
+    aliases: [fnp]
+    permission: frostednameplates.command
 permissions:
-  frostednametags.command:
-    description: Allows you to use the /frostednametags command
+  frostednameplates.command:
+    description: Allows you to use the /frostednameplates command
     default: op
-  frostednametags.*:
+  frostednameplates.*:
     default: op
     children:
-      frostednametags.command: true
+      frostednameplates.command: true

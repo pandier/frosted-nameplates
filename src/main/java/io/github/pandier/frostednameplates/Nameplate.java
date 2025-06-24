@@ -1,11 +1,11 @@
-package io.github.pandier.frostednametags;
+package io.github.pandier.frostednameplates;
 
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import io.github.pandier.frostednametags.util.DataValueCollectionBuilder;
-import io.github.pandier.frostednametags.util.EntityUtil;
-import io.github.pandier.frostednametags.util.PacketConsumer;
-import io.github.pandier.frostednametags.util.PacketFactory;
+import io.github.pandier.frostednameplates.util.DataValueCollectionBuilder;
+import io.github.pandier.frostednameplates.util.EntityUtil;
+import io.github.pandier.frostednameplates.util.PacketConsumer;
+import io.github.pandier.frostednameplates.util.PacketFactory;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.ApiStatus;
@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApiStatus.Internal
-public class Nametag {
+public class Nameplate {
     private static final int FLAGS_DATA_INDEX = 0;
     private static final int CUSTOM_NAME_DATA_INDEX = 2;
     private static final int CUSTOM_NAME_VISIBLE_DATA_INDEX = 3;
@@ -28,13 +28,13 @@ public class Nametag {
     private final int targetEntityId;
     private String text = ChatColor.RED + "N/A";
 
-    public Nametag(int entityId, @NotNull UUID uuid, int targetEntityId) {
+    public Nameplate(int entityId, @NotNull UUID uuid, int targetEntityId) {
         this.entityId = entityId;
         this.uuid = uuid;
         this.targetEntityId = targetEntityId;
     }
 
-    public Nametag(int targetEntityId) {
+    public Nameplate(int targetEntityId) {
         this(EntityUtil.generateEntityId(), UUID.randomUUID(), targetEntityId);
     }
 

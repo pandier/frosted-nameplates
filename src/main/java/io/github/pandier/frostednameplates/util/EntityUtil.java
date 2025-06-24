@@ -1,4 +1,4 @@
-package io.github.pandier.frostednametags.util;
+package io.github.pandier.frostednameplates.util;
 
 import com.comphenix.protocol.reflect.FuzzyReflection;
 import com.comphenix.protocol.reflect.accessors.Accessors;

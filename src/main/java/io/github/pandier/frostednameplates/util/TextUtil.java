@@ -1,4 +1,4 @@
-package io.github.pandier.frostednametags.util;
+package io.github.pandier.frostednameplates.util;
 
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.ApiStatus;

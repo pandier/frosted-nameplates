@@ -1,4 +1,4 @@
-package io.github.pandier.frostednametags.util;
+package io.github.pandier.frostednameplates.util;
 
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
