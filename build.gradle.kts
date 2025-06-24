@@ -3,6 +3,10 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
+val buildNumber = project.findProperty("buildNumber")
+if (buildNumber != null)
+    version = "$version+$buildNumber"
+
 repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
