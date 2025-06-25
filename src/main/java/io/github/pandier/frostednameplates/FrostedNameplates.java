@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class FrostedNameplates extends JavaPlugin implements Listener {
     private static final String MINIMUM_MINECRAFT_VERSION = "1.19.4";
@@ -30,9 +31,9 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     private PlaceholderAPIIntegration placeholderAPIIntegration;
     private MiniPlaceholdersIntegration miniPlaceholdersIntegration;
 
-    private final Map<Nameplate, List<UUID>> viewers = new HashMap<>();
-    private final Map<UUID, List<Nameplate>> viewed = new HashMap<>();
-    private final Map<Integer, Nameplate> nameplates = new HashMap<>();
+    private final Map<Nameplate, List<UUID>> viewers = new ConcurrentHashMap<>();
+    private final Map<UUID, List<Nameplate>> viewed = new ConcurrentHashMap<>();
+    private final Map<Integer, Nameplate> nameplates = new ConcurrentHashMap<>();
     private @Nullable BukkitTask updateTask;
 
     @Override

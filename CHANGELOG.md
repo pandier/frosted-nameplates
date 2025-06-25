@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Concurrent issues
+- NullPointerExceptions sometimes when disconnecting
+
 ## [0.1.0-alpha.2] - 2025-06-25
 
 ### Added

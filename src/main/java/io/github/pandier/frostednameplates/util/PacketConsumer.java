@@ -24,9 +24,12 @@ public interface PacketConsumer extends Consumer<PacketWrapper<?>> {
         return after(event, event.getUser());
     }
 
+    @SuppressWarnings("ConstantValue")
     @NotNull
     static PacketConsumer player(@NotNull Player player) {
-        return user(PacketEvents.getAPI().getPlayerManager().getUser(player));
+        final User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        if (user == null) return x -> {};
+        return user(user);
     }
 
     @NotNull
