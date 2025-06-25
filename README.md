@@ -4,9 +4,9 @@
 > 🚧 Frosted Nameplates is currently in alpha. Expect bugs or other issues.
 
 **Requires [PacketEvents](https://modrinth.com/plugin/packetevents) and [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**\
-**Supported versions:** 1.19.4 and above (tested on 1.21.4)
+**Supported versions:** Paper 1.19.4 and above (tested on 1.21.4)
 
-**Frosted Nameplates** is a [Spigot](https://www.spigotmc.org/) plugin that allows you to fully modify the text shown above the player's head,
+**Frosted Nameplates** is a [Paper](https://papermc.io/) plugin that allows you to fully modify the text shown above the player's head,
 including the player's name and hex color. It works by sending packets that create an invisible Text Display entity with a custom name,
 that's then being set as the passenger of the player. By using the custom name to display the text instead of the Text Display itself,
 the nameplate achieves visuals that are closer to the classic vanilla label.

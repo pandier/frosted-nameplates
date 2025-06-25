@@ -1,6 +1,7 @@
 plugins {
     java
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("com.gradleup.shadow") version "8.3.6"
     id("org.jetbrains.changelog") version "2.2.1"
 }
 
@@ -10,9 +11,7 @@ if (buildNumber != null)
 
 repositories {
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
-        name = "spigotmc-repo"
-    }
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
@@ -21,12 +20,21 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.8.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
 tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        minimize()
+    }
+
+    assemble {
+        dependsOn(shadowJar)
+    }
+
     runServer {
         minecraftVersion("1.21.4")
     }

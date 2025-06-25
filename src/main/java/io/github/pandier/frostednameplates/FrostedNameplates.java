@@ -3,10 +3,11 @@ package io.github.pandier.frostednameplates;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.util.Vector3d;
+import io.github.pandier.frostednameplates.config.FnpConfig;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
@@ -36,6 +37,13 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         // Check the Minecraft version
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_19_4))
             throw new IllegalStateException("FrostedNameplates requires Minecraft " + MINIMUM_MINECRAFT_VERSION + " or higher");
+
+        // Check if we are on Paper
+        try {
+            Class.forName("io.papermc.paper.event.entity.EntityMoveEvent");
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException("FrostedNameplates requires Paper");
+        }
     }
 
     @Override
@@ -93,9 +101,9 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         command.setTabCompleter(instance);
     }
 
-    private @NotNull String createNameplateText(@NotNull Player player) {
+    private @NotNull Component createNameplateText(@NotNull Player player) {
         final String text = PlaceholderAPI.setPlaceholders(player, this.config.getNameplate());
-        return ChatColor.translateAlternateColorCodes('&', text);
+        return config.getFormatter().format(this, text);
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
@@ -142,12 +150,12 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         if (nameplate == null) return;
         final List<UUID> viewers = this.viewers.get(nameplate);
         if (viewers == null || viewers.isEmpty()) return;
-        final String text = createNameplateText(player);
+        final Component text = createNameplateText(player);
+        if (nameplate.getText().equals(text)) return;
+        nameplate.setText(text);
         viewers.removeIf(viewerUuid -> {
             final Player viewer = getServer().getPlayer(viewerUuid);
             if (viewer == null) return true;
-            if (nameplate.getText().equals(text)) return false;
-            nameplate.setText(text);
             nameplate.sendUpdatePackets(PacketConsumer.player(viewer));
             return false;
         });
