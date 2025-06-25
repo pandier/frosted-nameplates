@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Plugin now only supports Paper
+- PlaceholderAPI dependency is now optional
 
 ## [0.1.0-alpha.1] - 2025-06-24
 

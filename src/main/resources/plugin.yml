@@ -9,6 +9,8 @@ api-version: '1.19'
 
 depend:
   - packetevents
+
+softdepend:
   - PlaceholderAPI
 
 commands:

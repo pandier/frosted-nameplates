@@ -4,9 +4,9 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.util.Vector3d;
 import io.github.pandier.frostednameplates.config.FnpConfig;
+import io.github.pandier.frostednameplates.integration.PlaceholderAPIIntegration;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
@@ -26,10 +26,11 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     private final FnpConfig config = new FnpConfig();
     private final FnpPacketListener packetListener = new FnpPacketListener(this);
 
+    private PlaceholderAPIIntegration placeholderAPIIntegration;
+
     private final Map<Nameplate, List<UUID>> viewers = new HashMap<>();
     private final Map<UUID, List<Nameplate>> viewed = new HashMap<>();
     private final Map<Integer, Nameplate> nameplates = new HashMap<>();
-
     private @Nullable BukkitTask updateTask;
 
     @Override
@@ -48,6 +49,8 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        this.placeholderAPIIntegration = new PlaceholderAPIIntegration(this);
+
         getServer().getPluginManager().registerEvents(new FnpListener(this), this);
 
         PacketEvents.getAPI().getEventManager().registerListener(packetListener);
@@ -102,7 +105,7 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     }
 
     private @NotNull Component createNameplateText(@NotNull Player player) {
-        final String text = PlaceholderAPI.setPlaceholders(player, this.config.getNameplate());
+        final String text = placeholderAPIIntegration.setPlaceholders(player, this.config.getNameplate());
         return config.getFormatter().format(this, text);
     }
 
