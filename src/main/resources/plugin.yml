@@ -4,7 +4,6 @@ description: Allows customizing the text above players' heads
 authors: [Pandier]
 
 main: io.github.pandier.frostednameplates.FrostedNameplates
-load: STARTUP
 api-version: '1.19'
 
 depend:
@@ -12,6 +11,7 @@ depend:
 
 softdepend:
   - PlaceholderAPI
+  - MiniPlaceholders
 
 commands:
   frostednameplates:

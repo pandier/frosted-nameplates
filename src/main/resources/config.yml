@@ -1,13 +1,13 @@
 
 # The customized nameplate shown above the player's head.
-# Supports placeholders from PlaceholderAPI.
+# Supports placeholders from PlaceholderAPI and MiniPlaceholders (requires minimessage formatter).
 #
 # Default: '%player_name%'
 nameplate: '%player_name%'
 
 # The formatter used for formatting the nameplate.
 # Available options:
-#   minimessage = Uses Adventure's MiniMessage format (recommended)
+#   minimessage = Uses Adventure's MiniMessage format (recommended, supports MiniPlaceholders)
 #   legacy = Uses legacy colors (&)
 #   hybrid = Combines both the MiniMessage format and the Legacy format
 #

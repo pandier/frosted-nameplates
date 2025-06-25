@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.util.Vector3d;
 import io.github.pandier.frostednameplates.config.FnpConfig;
+import io.github.pandier.frostednameplates.integration.MiniPlaceholdersIntegration;
 import io.github.pandier.frostednameplates.integration.PlaceholderAPIIntegration;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
@@ -27,6 +28,7 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     private final FnpPacketListener packetListener = new FnpPacketListener(this);
 
     private PlaceholderAPIIntegration placeholderAPIIntegration;
+    private MiniPlaceholdersIntegration miniPlaceholdersIntegration;
 
     private final Map<Nameplate, List<UUID>> viewers = new HashMap<>();
     private final Map<UUID, List<Nameplate>> viewed = new HashMap<>();
@@ -50,6 +52,7 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         this.placeholderAPIIntegration = new PlaceholderAPIIntegration(this);
+        this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(this);
 
         getServer().getPluginManager().registerEvents(new FnpListener(this), this);
 
@@ -106,7 +109,7 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
 
     private @NotNull Component createNameplateText(@NotNull Player player) {
         final String text = placeholderAPIIntegration.setPlaceholders(player, this.config.getNameplate());
-        return config.getFormatter().format(this, text);
+        return config.getFormatter().format(text, player, this);
     }
 
     private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
@@ -187,5 +190,9 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
             }
         }
         removeNameplate(player.getEntityId());
+    }
+
+    public MiniPlaceholdersIntegration getMiniPlaceholdersIntegration() {
+        return miniPlaceholdersIntegration;
     }
 }

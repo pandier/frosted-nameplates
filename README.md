@@ -32,13 +32,22 @@ The configuration can be found under `config/FrostedNameplates/config.yml` and c
 
 ```yml
 # The customized nameplate shown above the player's head.
-# Supports placeholders from PlaceholderAPI.
+# Supports placeholders from PlaceholderAPI and MiniPlaceholders (requires minimessage formatter).
 #
 # Default: '%player_name%'
 nameplate: '%player_name%'
 
+# The formatter used for formatting the nameplate.
+# Available options:
+#   minimessage = Uses Adventure's MiniMessage format (recommended, supports MiniPlaceholders)
+#   legacy = Uses legacy colors (&)
+#   hybrid = Combines both the MiniMessage format and the Legacy format
+#
+# Default: minimessage
+formatter: minimessage
+
 # The interval in ticks between nameplate updates.
-# Anything below 1 will turn off updates completely.
+# Anything below 1 will turn off automatic updates completely.
 # 20 ticks = 1 second
 #
 # Default: 20

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Different formatting options (Legacy, MiniMessage)
+- Support for MiniPlaceholders
 
 ### Changed
 
