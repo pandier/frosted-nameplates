@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Some NullPointerExceptions
+
 ## [0.1.0-alpha.3] - 2025-06-25
 
 ### Fixed

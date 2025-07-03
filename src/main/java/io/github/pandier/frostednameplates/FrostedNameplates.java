@@ -138,10 +138,12 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         final List<UUID> viewers = this.viewers.remove(nameplate);
         if (viewers != null) {
             for (UUID viewerUuid : viewers) {
+                // This can happen somehow...
+                if (viewerUuid == null) continue;
                 this.viewed.getOrDefault(viewerUuid, new ArrayList<>()).remove(nameplate);
-                final Player player = getServer().getPlayer(viewerUuid);
-                if (player == null) continue;
-                nameplate.sendRemovePackets(PacketConsumer.player(player));
+                final Player viewer = getServer().getPlayer(viewerUuid);
+                if (viewer == null) continue;
+                nameplate.sendRemovePackets(PacketConsumer.player(viewer));
             }
         }
     }
@@ -161,6 +163,8 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         if (nameplate.getText().equals(text)) return;
         nameplate.setText(text);
         viewers.removeIf(viewerUuid -> {
+            // This can happen somehow...
+            if (viewerUuid == null) return true;
             final Player viewer = getServer().getPlayer(viewerUuid);
             if (viewer == null) return true;
             nameplate.sendUpdatePackets(PacketConsumer.player(viewer));
