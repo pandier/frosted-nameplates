@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.pandier.frostednameplates.util.PacketConsumer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +37,8 @@ public final class FnpPacketListener extends PacketListenerAbstract {
     private void onSpawnEntity(PacketSendEvent event, WrapperPlayServerSpawnEntity packet) {
         if (packet.getEntityType() != EntityTypes.PLAYER) return;
         final int targetEntityId = packet.getEntityId();
-        plugin.showNameplate(event.getPlayer(), PacketConsumer.after(event), targetEntityId, packet.getPosition());
+        final Player player = event.getPlayer();
+        plugin.showNameplate(PacketConsumer.after(event), player.getWorld(), targetEntityId, packet.getPosition());
     }
 
     private void onEntityMetadata(PacketSendEvent event, WrapperPlayServerEntityMetadata packet) {
@@ -55,7 +57,7 @@ public final class FnpPacketListener extends PacketListenerAbstract {
 
     private void onDestroyEntities(PacketSendEvent event, WrapperPlayServerDestroyEntities packet) {
         for (int entityId : packet.getEntityIds()) {
-            plugin.hideNameplate(event.getPlayer(), PacketConsumer.after(event), entityId);
+            plugin.hideNameplate(PacketConsumer.after(event), entityId);
         }
     }
 }

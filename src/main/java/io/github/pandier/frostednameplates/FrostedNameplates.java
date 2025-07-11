@@ -172,18 +172,18 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         });
     }
 
-    void showNameplate(@NotNull Player player, @NotNull PacketConsumer packetConsumer, int targetEntityId, @NotNull Vector3d position) {
-        final Nameplate nameplate = getOrCreateNameplate(player.getWorld(), targetEntityId);
-        this.viewers.computeIfAbsent(nameplate, k -> new ArrayList<>()).add(player.getUniqueId());
-        this.viewed.computeIfAbsent(player.getUniqueId(), k -> new ArrayList<>()).add(nameplate);
+    void showNameplate(@NotNull PacketConsumer packetConsumer, @NotNull World world, int targetEntityId, @NotNull Vector3d position) {
+        final Nameplate nameplate = getOrCreateNameplate(world, targetEntityId);
+        this.viewers.computeIfAbsent(nameplate, k -> new ArrayList<>()).add(packetConsumer.getUUID());
+        this.viewed.computeIfAbsent(packetConsumer.getUUID(), k -> new ArrayList<>()).add(nameplate);
         nameplate.sendSpawnPackets(packetConsumer, position);
     }
 
-    void hideNameplate(@NotNull Player player, @NotNull PacketConsumer packetConsumer, int targetEntityId) {
+    void hideNameplate(@NotNull PacketConsumer packetConsumer, int targetEntityId) {
         final Nameplate nameplate = getNameplate(targetEntityId);
         if (nameplate == null) return;
-        this.viewers.getOrDefault(nameplate, new ArrayList<>()).remove(player.getUniqueId());
-        this.viewed.getOrDefault(player.getUniqueId(), new ArrayList<>()).remove(nameplate);
+        this.viewers.getOrDefault(nameplate, new ArrayList<>()).remove(packetConsumer.getUUID());
+        this.viewed.getOrDefault(packetConsumer.getUUID(), new ArrayList<>()).remove(nameplate);
         nameplate.sendRemovePackets(packetConsumer);
     }
 

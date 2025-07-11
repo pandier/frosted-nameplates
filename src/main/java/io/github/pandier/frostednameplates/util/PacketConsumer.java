@@ -8,15 +8,42 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @ApiStatus.Internal
-@FunctionalInterface
 public interface PacketConsumer extends Consumer<PacketWrapper<?>> {
 
+    @NotNull UUID getUUID();
+
     @NotNull
-    static PacketConsumer after(@NotNull PacketSendEvent event, @NotNull User user) {
-        return packet -> event.getTasksAfterSend().add(() -> user.sendPacket(packet));
+    static PacketConsumer user(@NotNull User user) {
+        return new PacketConsumer() {
+            @Override
+            public @NotNull UUID getUUID() {
+                return user.getUUID();
+            }
+
+            @Override
+            public void accept(PacketWrapper<?> packetWrapper) {
+                user.sendPacket(packetWrapper);
+            }
+        };
+    }
+
+    @NotNull
+    static PacketConsumer player(@NotNull Player player) {
+        return new PacketConsumer() {
+            @Override
+            public @NotNull UUID getUUID() {
+                return player.getUniqueId();
+            }
+
+            @Override
+            public void accept(PacketWrapper<?> packetWrapper) {
+                PacketEvents.getAPI().getPlayerManager().sendPacket(player, packetWrapper);
+            }
+        };
     }
 
     @NotNull
@@ -24,16 +51,18 @@ public interface PacketConsumer extends Consumer<PacketWrapper<?>> {
         return after(event, event.getUser());
     }
 
-    @SuppressWarnings("ConstantValue")
     @NotNull
-    static PacketConsumer player(@NotNull Player player) {
-        final User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-        if (user == null) return x -> {};
-        return user(user);
-    }
+    static PacketConsumer after(@NotNull PacketSendEvent event, @NotNull User user) {
+        return new PacketConsumer() {
+            @Override
+            public @NotNull UUID getUUID() {
+                return user.getUUID();
+            }
 
-    @NotNull
-    static PacketConsumer user(@NotNull User user) {
-        return user::sendPacket;
+            @Override
+            public void accept(PacketWrapper<?> packetWrapper) {
+                event.getTasksAfterSend().add(() -> user.sendPacket(packetWrapper));
+            }
+        };
     }
 }
