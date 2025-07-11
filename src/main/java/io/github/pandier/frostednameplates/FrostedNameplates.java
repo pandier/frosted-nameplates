@@ -113,13 +113,17 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         return config.getFormatter().format(text, player, this);
     }
 
-    private @Nullable Player getPlayerFromId(@NotNull World world, int playerId) {
+    private @Nullable Player getPlayerFromId(@Nullable World world, int playerId) {
+        if (world == null) {
+            getLogger().warning("Tried to find player with id " + playerId + " in a null world");
+            // Do not return here, we can still use null world (will check all worlds instead)
+        }
         final Entity entity = SpigotConversionUtil.getEntityById(world, playerId);
         if (!(entity instanceof Player player)) return null;
         return player;
     }
 
-    @NotNull Nameplate getOrCreateNameplate(@NotNull World world, int targetEntityId) {
+    @NotNull Nameplate getOrCreateNameplate(@Nullable World world, int targetEntityId) {
         return nameplates.computeIfAbsent(targetEntityId, k -> {
             final Nameplate nameplate = new Nameplate(targetEntityId);
             final Player player = getPlayerFromId(world, targetEntityId);
@@ -172,7 +176,12 @@ public final class FrostedNameplates extends JavaPlugin implements Listener {
         });
     }
 
-    void showNameplate(@NotNull PacketConsumer packetConsumer, @NotNull World world, int targetEntityId, @NotNull Vector3d position) {
+    @SuppressWarnings("ConstantValue")
+    void showNameplate(@NotNull PacketConsumer packetConsumer, @Nullable World world, int targetEntityId, @NotNull Vector3d position) {
+        // null items were found inside the viewer list during testing, so we're logging a warning in case it happens again
+        if (packetConsumer.getUUID() == null) {
+            getLogger().warning("Tried to show nameplate to player with null UUID");
+        }
         final Nameplate nameplate = getOrCreateNameplate(world, targetEntityId);
         this.viewers.computeIfAbsent(nameplate, k -> new ArrayList<>()).add(packetConsumer.getUUID());
         this.viewed.computeIfAbsent(packetConsumer.getUUID(), k -> new ArrayList<>()).add(nameplate);
