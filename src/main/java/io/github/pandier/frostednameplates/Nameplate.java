@@ -82,4 +82,13 @@ public class Nameplate {
     public Component getText() {
         return text;
     }
+
+    public int getEntityId() {
+        return entityId;
+    }
+
+    @NotNull
+    public UUID getUuid() {
+        return uuid;
+    }
 }

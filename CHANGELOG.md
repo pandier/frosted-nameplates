@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Nameplates detaching when a player receives a passenger
+
 ## [0.1.0-alpha.5] - 2025-07-11
 
 ### Added
