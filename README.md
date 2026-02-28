@@ -21,10 +21,11 @@ Supports [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245
 
 All actions are available under the `/frostednameplates` (shortly `/fnp`) command.
 
-| Command       | Permission                  | Description                        |
-|---------------|-----------------------------|------------------------------------|
-| `/fnp reload` | `frostednameplates.command` | Reloads the plugin's configuration |
-| `/fnp update` | `frostednameplates.command` | Updates all nameplates             |
+| Command                 | Permission                  | Description                                 |
+|-------------------------|-----------------------------|---------------------------------------------|
+| `/fnp reload`           | `frostednameplates.command` | Reloads the plugin's configuration          |
+| `/fnp update`           | `frostednameplates.command` | Updates all nameplates                      |
+| `/fnp update <players>` | `frostednameplates.command` | Updates nameplates of the specified players |
 
 ## ⚙️ Configuration
 
@@ -41,7 +42,6 @@ nameplate: '%player_name%'
 # Available options:
 #   minimessage = Uses Adventure's MiniMessage format (recommended, supports MiniPlaceholders)
 #   legacy = Uses legacy colors (&)
-#   hybrid = Combines both the MiniMessage format and the Legacy format
 #
 # Default: minimessage
 formatter: minimessage
