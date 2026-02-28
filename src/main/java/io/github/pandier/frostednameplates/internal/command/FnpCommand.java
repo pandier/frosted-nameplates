@@ -1,70 +1,86 @@
 package io.github.pandier.frostednameplates.internal.command;
 
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public final class FnpCommand implements CommandExecutor, TabCompleter {
-    private static final String PRIMARY_COLOR = "x5f9fe8".chars().mapToObj(x -> "" + ChatColor.COLOR_CHAR + (char) x).collect(Collectors.joining());
-    private static final String SECONDARY_COLOR = "x1c70ed".chars().mapToObj(x -> "" + ChatColor.COLOR_CHAR + (char) x).collect(Collectors.joining());
-    private static final String INFO_PREFIX = PRIMARY_COLOR;
+import static io.papermc.paper.command.brigadier.Commands.argument;
+import static io.papermc.paper.command.brigadier.Commands.literal;
+import static net.kyori.adventure.text.Component.text;
 
-    private final FrostedNameplatesPlugin plugin;
+public final class FnpCommand {
+    private static final TextColor INFO_COLOR = TextColor.color(0xC5DDF9);
+    private static final TextColor PRIMARY_COLOR = TextColor.color(0x55A3FC);
+    private static final TextColor SECONDARY_COLOR = TextColor.color(0x1C70ED);
+    private static final Component PREFIX = text()
+            .color(INFO_COLOR)
+//            .append(text("["))
+            .append(text("[❄] ", PRIMARY_COLOR))
+//            .append(text("] "))
+            .build();
 
-    public FnpCommand(@NotNull FrostedNameplatesPlugin plugin) {
-        this.plugin = plugin;
+    @SuppressWarnings("UnstableApiUsage")
+    public static LiteralCommandNode<CommandSourceStack> create(FrostedNameplatesPlugin plugin) {
+        return literal("frostednameplates")
+                .requires(source -> source.getSender().hasPermission("frostednameplates.command"))
+                .executes(ctx -> help(plugin, ctx.getSource().getSender()))
+                .then(literal("update")
+                        .then(argument("players", ArgumentTypes.players())
+                                .executes(ctx -> {
+                                    List<Player> players = ctx.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource());
+                                    return update(plugin, ctx.getSource().getSender(), players);
+                                }))
+                        .executes(ctx -> updateAll(plugin, ctx.getSource().getSender())))
+                .then(literal("reload")
+                        .executes(ctx -> reload(plugin, ctx.getSource().getSender())))
+                .build();
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            help(sender, label);
-            return true;
+    private static int update(FrostedNameplatesPlugin plugin, CommandSender sender, List<Player> players) {
+        for (Player player : players) {
+            plugin.getFn().update(player);
         }
-
-        final String subcommand = args[0].toLowerCase(Locale.ROOT);
-        switch (subcommand) {
-            case "reload" -> {
-                plugin.reloadConfig();
-                sender.sendMessage(INFO_PREFIX + "Successfully reloaded the plugin's configuration");
-            }
-            case "update" -> {
-                plugin.getFn().update();
-                sender.sendMessage(INFO_PREFIX + "Updated all nameplates");
-            }
-            default -> help(sender, label);
-        }
-
-        return true;
+        sender.sendMessage(PREFIX
+                .append(text("Updated nameplate for "))
+                .append(text(players.size() == 1 ? players.getFirst().getName() : players.size() + " players", PRIMARY_COLOR)));
+        return players.size();
     }
 
-    @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 1) {
-            final String arg = args[0].toLowerCase(Locale.ROOT);
-            return Stream.of("reload", "update")
-                    .filter(subcommand -> subcommand.startsWith(arg))
-                    .toList();
-        }
-        return List.of();
+
+    private static int updateAll(FrostedNameplatesPlugin plugin, CommandSender sender) {
+        plugin.getFn().update();
+        sender.sendMessage(PREFIX.append(text("Updated all nameplates")));
+        return 1;
     }
 
-    private void help(@NotNull CommandSender sender, @NotNull String label) {
-        final String message = "\n " +
-                PRIMARY_COLOR + "❄ Frosted " + SECONDARY_COLOR + "Nameplates " + ChatColor.GRAY + "v" + plugin.getDescription().getVersion() +
-                "\n by " + String.join(", ", plugin.getDescription().getAuthors()) + "\n " +
-                PRIMARY_COLOR + "\n /" + label + " reload" + ChatColor.GRAY + " - Reloads the plugin's configuration" +
-                PRIMARY_COLOR + "\n /" + label + " update" + ChatColor.GRAY + " - Updates all nameplates" +
-                "\n ";
-        sender.sendMessage(message);
+    private static int reload(FrostedNameplatesPlugin plugin, CommandSender sender) {
+        plugin.reloadConfig();
+        sender.sendMessage(PREFIX.append(text("Successfully reloaded the plugin's configuration")));
+        return 1;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static int help(FrostedNameplatesPlugin plugin, CommandSender sender) {
+        sender.sendMessage(Component.text()
+                .color(INFO_COLOR)
+                .content("\n ")
+                .append(text("❄ Frosted ", PRIMARY_COLOR))
+                .append(text("Nameplates", SECONDARY_COLOR))
+                .append(text(" v" + plugin.getPluginMeta().getVersion() + "\n"))
+                .append(text(" by " + String.join(", ", plugin.getPluginMeta().getAuthors()) + "\n\n"))
+                .append(text(" /fnp reload", PRIMARY_COLOR))
+                .append(text(" - Reloads the plugin's configuration\n"))
+                .append(text(" /fnp update [players]", PRIMARY_COLOR))
+                .append(text(" - Updates nameplates of the specified players or all players\n"))
+                .build());
+        return 1;
     }
 }

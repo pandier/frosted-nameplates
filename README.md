@@ -4,7 +4,7 @@
 > 🚧 Frosted Nameplates is currently in alpha. Expect bugs or other issues.
 
 **Requires [PacketEvents](https://modrinth.com/plugin/packetevents)**\
-**Supported versions:** Paper 1.19.4 and above (tested on 1.21.4)
+**Supported versions:** Paper 1.20.6 and above (tested on 1.21.11)
 
 **Frosted Nameplates** is a [Paper](https://papermc.io/) plugin that allows you to fully modify the text shown above the player's head,
 including the player's name and hex color. It works by sending packets that create an invisible Text Display entity with a custom name,

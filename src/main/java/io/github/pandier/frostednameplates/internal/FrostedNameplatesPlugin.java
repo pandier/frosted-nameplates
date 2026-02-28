@@ -8,14 +8,16 @@ import io.github.pandier.frostednameplates.internal.integration.MiniPlaceholders
 import io.github.pandier.frostednameplates.internal.integration.PlaceholderAPIIntegration;
 import io.github.pandier.frostednameplates.internal.listener.FnpListener;
 import io.github.pandier.frostednameplates.internal.packet.FnpPacketListener;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public final class FrostedNameplatesPlugin extends JavaPlugin implements Listener {
     private static final String MINIMUM_MINECRAFT_VERSION = "1.19.4";
@@ -90,12 +92,11 @@ public final class FrostedNameplatesPlugin extends JavaPlugin implements Listene
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void setupCommands() {
-        final PluginCommand command = getCommand("frostednameplates");
-        if (command == null) throw new IllegalStateException("Missing command 'frostednameplates'");
-        final FnpCommand instance = new FnpCommand(this);
-        command.setExecutor(instance);
-        command.setTabCompleter(instance);
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            commands.registrar().register(FnpCommand.create(this), List.of("fnp"));
+        });
     }
 
     public @NotNull Component createNameplateText(@NotNull Player player) {

@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Updating nameplates of specific players using `/fnp update <players>`
+
+### Changed
+
+- Switched to a Paper plugin
+
 ### Removed
 
 - Remove `hybrid` formatter, which didn't even work, and proper implementation is out of scope right now
