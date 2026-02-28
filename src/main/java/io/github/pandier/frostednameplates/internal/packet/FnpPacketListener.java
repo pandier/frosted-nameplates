@@ -1,15 +1,17 @@
-package io.github.pandier.frostednameplates;
+package io.github.pandier.frostednameplates.internal.packet;
 
 import com.github.retrooper.packetevents.event.*;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
-import io.github.pandier.frostednameplates.util.PacketConsumer;
-import org.bukkit.entity.Player;
+import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
+import io.github.pandier.frostednameplates.internal.NameplateImpl;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,9 +19,9 @@ import java.util.Arrays;
 
 @ApiStatus.Internal
 public final class FnpPacketListener extends PacketListenerAbstract {
-    private final FrostedNameplates plugin;
+    private final FrostedNameplatesPlugin plugin;
 
-    public FnpPacketListener(@NotNull FrostedNameplates plugin) {
+    public FnpPacketListener(@NotNull FrostedNameplatesPlugin plugin) {
         super(PacketListenerPriority.NORMAL);
         this.plugin = plugin;
     }
@@ -42,27 +44,38 @@ public final class FnpPacketListener extends PacketListenerAbstract {
     private void onSpawnEntity(PacketSendEvent event, WrapperPlayServerSpawnEntity packet) {
         if (packet.getEntityType() != EntityTypes.PLAYER) return;
         final int targetEntityId = packet.getEntityId();
-        final Player player = event.getPlayer();
-        plugin.showNameplate(PacketConsumer.after(event), player.getWorld(), targetEntityId, packet.getPosition());
+        final User user = event.getUser();
+        final Vector3d position = packet.getPosition();
+
+        event.getTasksAfterSend().add(() -> {
+            NameplateImpl nameplate = plugin.getFn().getNameplate(targetEntityId);
+            if (nameplate == null) return;
+            nameplate.show(PacketConsumer.user(user), position);
+        });
     }
 
     private void onEntityMetadata(PacketSendEvent event, WrapperPlayServerEntityMetadata packet) {
-        final Nameplate nameplate = plugin.getNameplate(packet.getEntityId());
-        if (nameplate == null) return;
         final EntityData<?> flagsData = packet.getEntityMetadata().stream()
                 .filter(value -> value.getIndex() == 0)
                 .findFirst()
                 .orElse(null);
         if (flagsData == null) return;
+
+        final int targetEntityId = packet.getEntityId();
+        NameplateImpl nameplate = plugin.getFn().getNameplate(targetEntityId);
+        if (nameplate == null) return;
+
+        final User user = event.getUser();
         final byte flags = (byte) flagsData.getValue();
         boolean sneaking = (flags & 2) != 0;
         boolean invisible = (flags & 32) != 0;
-        nameplate.sendStatusPackets(PacketConsumer.after(event), sneaking, invisible);
+
+        nameplate.updateStatus(PacketConsumer.user(user), sneaking, invisible);
     }
 
     private void onSetPassengers(PacketSendEvent event, WrapperPlayServerSetPassengers packet) {
         final int targetEntityId = packet.getEntityId();
-        final Nameplate nameplate = plugin.getNameplate(targetEntityId);
+        final NameplateImpl nameplate = plugin.getFn().getNameplate(targetEntityId);
         if (nameplate == null) return;
 
         final int[] passengers = packet.getPassengers();
@@ -78,8 +91,11 @@ public final class FnpPacketListener extends PacketListenerAbstract {
     }
 
     private void onDestroyEntities(PacketSendEvent event, WrapperPlayServerDestroyEntities packet) {
+        User user = event.getUser();
         for (int entityId : packet.getEntityIds()) {
-            plugin.hideNameplate(PacketConsumer.after(event), entityId);
+            NameplateImpl nameplate = plugin.getFn().getNameplate(entityId);
+            if (nameplate == null) return;
+            nameplate.hide(PacketConsumer.user(user));
         }
     }
 }

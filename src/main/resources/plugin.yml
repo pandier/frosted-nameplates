@@ -3,7 +3,7 @@ version: ${version}
 description: Allows customizing the text above players' heads
 authors: [Pandier]
 
-main: io.github.pandier.frostednameplates.FrostedNameplates
+main: io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin
 api-version: '1.19'
 
 depend:

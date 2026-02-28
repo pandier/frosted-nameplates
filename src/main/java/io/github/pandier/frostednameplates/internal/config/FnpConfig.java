@@ -1,6 +1,6 @@
-package io.github.pandier.frostednameplates.config;
+package io.github.pandier.frostednameplates.internal.config;
 
-import io.github.pandier.frostednameplates.formatter.Formatter;
+import io.github.pandier.frostednameplates.internal.formatter.Formatter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,5 +1,6 @@
-package io.github.pandier.frostednameplates;
+package io.github.pandier.frostednameplates.internal.command;
 
+import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,9 +18,9 @@ public final class FnpCommand implements CommandExecutor, TabCompleter {
     private static final String SECONDARY_COLOR = "x1c70ed".chars().mapToObj(x -> "" + ChatColor.COLOR_CHAR + (char) x).collect(Collectors.joining());
     private static final String INFO_PREFIX = PRIMARY_COLOR;
 
-    private final FrostedNameplates plugin;
+    private final FrostedNameplatesPlugin plugin;
 
-    public FnpCommand(@NotNull FrostedNameplates plugin) {
+    public FnpCommand(@NotNull FrostedNameplatesPlugin plugin) {
         this.plugin = plugin;
     }
 

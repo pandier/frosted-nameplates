@@ -1,6 +1,6 @@
-package io.github.pandier.frostednameplates.formatter;
+package io.github.pandier.frostednameplates.internal.formatter;
 
-import io.github.pandier.frostednameplates.FrostedNameplates;
+import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -15,20 +15,20 @@ import java.util.Map;
 public enum Formatter {
     MINIMESSAGE {
         @Override
-        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplates plugin) {
+        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
             final TagResolver tagResolver = plugin.getMiniPlaceholdersIntegration().tagResolver(player);
             return MiniMessage.miniMessage().deserialize(text.replace('§', '?'), tagResolver);
         }
     },
     LEGACY {
         @Override
-        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplates plugin) {
+        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
             return getLegacySerializer().deserialize(text.replace('&', '§'));
         }
     },
     HYBRID {
         @Override
-        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplates plugin) {
+        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
             return MINIMESSAGE.format(MiniMessage.miniMessage().serialize(LEGACY.format(text, player, plugin)), player, plugin);
         }
     };
@@ -51,5 +51,5 @@ public enum Formatter {
         return LEGACY_SERIALIZER;
     }
 
-    public abstract @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplates plugin);
+    public abstract @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin);
 }
