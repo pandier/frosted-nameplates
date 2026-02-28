@@ -1,7 +1,6 @@
 package io.github.pandier.frostednameplates.internal;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.pandier.frostednameplates.internal.command.FnpCommand;
 import io.github.pandier.frostednameplates.internal.config.FnpConfig;
 import io.github.pandier.frostednameplates.internal.integration.MiniPlaceholdersIntegration;
@@ -20,8 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public final class FrostedNameplatesPlugin extends JavaPlugin implements Listener {
-    private static final String MINIMUM_MINECRAFT_VERSION = "1.19.4";
-
     private final FnpConfig config = new FnpConfig();
     private final FnpPacketListener packetListener = new FnpPacketListener(this);
     private FrostedNameplatesImpl fn;
@@ -30,20 +27,6 @@ public final class FrostedNameplatesPlugin extends JavaPlugin implements Listene
     private MiniPlaceholdersIntegration miniPlaceholdersIntegration;
 
     private @Nullable BukkitTask updateTask;
-
-    @Override
-    public void onLoad() {
-        // Check the Minecraft version
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_19_4))
-            throw new IllegalStateException("FrostedNameplates requires Minecraft " + MINIMUM_MINECRAFT_VERSION + " or higher");
-
-        // Check if we are on Paper
-        try {
-            Class.forName("io.papermc.paper.event.entity.EntityMoveEvent");
-        } catch (ClassNotFoundException ex) {
-            throw new IllegalStateException("FrostedNameplates requires Paper");
-        }
-    }
 
     @Override
     public void onEnable() {
