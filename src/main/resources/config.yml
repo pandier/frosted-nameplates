@@ -9,7 +9,6 @@ nameplate: '%player_name%'
 # Available options:
 #   minimessage = Uses Adventure's MiniMessage format (recommended, supports MiniPlaceholders)
 #   legacy = Uses legacy colors (&)
-#   hybrid = Combines both the MiniMessage format and the Legacy format
 #
 # Default: minimessage
 formatter: minimessage

@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove `hybrid` formatter, which didn't even work, and proper implementation is out of scope right now
+
+### Fixed
+
+- Complete rewrite of the backend with proper synchronization, hopefully this fixes a lot of niche bugs
+
 ## [0.1.0-alpha.6] - 2025-12-19
 
 ### Fixed

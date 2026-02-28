@@ -25,12 +25,6 @@ public enum Formatter {
         public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
             return getLegacySerializer().deserialize(text.replace('&', '§'));
         }
-    },
-    HYBRID {
-        @Override
-        public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
-            return MINIMESSAGE.format(MiniMessage.miniMessage().serialize(LEGACY.format(text, player, plugin)), player, plugin);
-        }
     };
 
     public static final Map<String, Formatter> BY_NAME = new HashMap<>();
