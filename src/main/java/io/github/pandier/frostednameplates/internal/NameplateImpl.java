@@ -1,7 +1,6 @@
 package io.github.pandier.frostednameplates.internal;
 
 import com.github.retrooper.packetevents.util.Vector3d;
-import io.github.pandier.frostednameplates.api.Nameplate;
 import io.github.pandier.frostednameplates.internal.packet.entity.NameplateEntity;
 import io.github.pandier.frostednameplates.internal.packet.PacketConsumer;
 import net.kyori.adventure.text.Component;
@@ -13,30 +12,26 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 
 @ApiStatus.Internal
-public class NameplateImpl implements Nameplate {
+public class NameplateImpl {
     private final FrostedNameplatesImpl fn;
-    private final Function<Player, Component> nameplateTextFactory;
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Set<UUID> viewers = ConcurrentHashMap.newKeySet();
+    private final ReentrantReadWriteLock removeLock = new ReentrantReadWriteLock();
     private final NameplateEntity entity;
     private final int targetId;
+    private final Set<UUID> viewers = ConcurrentHashMap.newKeySet();
     private volatile Component text = Component.empty(); // only update on main thread
     private volatile boolean removed = false;
 
-    public NameplateImpl(@NotNull FrostedNameplatesImpl fn, @NotNull Function<Player, Component> nameplateTextFactory, int targetId) {
+    public NameplateImpl(@NotNull FrostedNameplatesImpl fn, int targetId) {
         this.fn = fn;
-        this.nameplateTextFactory = nameplateTextFactory;
         this.entity = new NameplateEntity(targetId);
         this.targetId = targetId;
     }
 
     // PacketConsumer's thread
     public void show(@NotNull PacketConsumer consumer, @NotNull Vector3d position) {
-        this.lock.readLock().lock();
-
+        this.removeLock.readLock().lock();
         try {
             if (this.removed) return;
 
@@ -46,12 +41,13 @@ public class NameplateImpl implements Nameplate {
             Component text = this.text;
             this.entity.show(consumer, position, text);
 
-            this.fn.getServer().getScheduler().runTask(this.fn.getPlugin(), () -> {
-                if (this.removed || this.text.equals(text)) return;
-                this.entity.updateText(consumer, this.text);
-            });
+            // Make sure that they're seeing the latest version
+            while (this.text != text) {
+                text = this.text;
+                this.entity.updateText(consumer, text);
+            }
         } finally {
-            this.lock.readLock().unlock();
+            this.removeLock.readLock().unlock();
         }
     }
 
@@ -62,74 +58,62 @@ public class NameplateImpl implements Nameplate {
 
     // PacketConsumer's thread
     public void hide(@NotNull PacketConsumer consumer) {
-        this.lock.readLock().lock();
-
+        this.removeLock.readLock().lock();
         try {
             if (this.removed) return;
 
-            this.removeViewerInternal(consumer.getUniqueId());
+            this.viewers.remove(consumer.getUniqueId());
+            this.fn.getNameplateViewershipTracker().hide(consumer.getUniqueId(), this.targetId);
             this.entity.hide(consumer);
         } finally {
-            this.lock.readLock().unlock();
+            this.removeLock.readLock().unlock();
         }
     }
 
     // Main thread
-    public void removeViewer(@NotNull UUID uuid) {
-        this.lock.readLock().lock();
-
-        try {
-            if (this.removed) return;
-
-            this.removeViewerInternal(uuid);
-        } finally {
-            this.lock.readLock().unlock();
-        }
-    }
-
-    private void removeViewerInternal(@NotNull UUID uuid) {
+    public void disposeViewer(@NotNull UUID uuid) {
+        if (this.removed) return;
         this.viewers.remove(uuid);
-        this.fn.getNameplateViewershipTracker().hide(uuid, this.targetId);
     }
 
     // Main thread
-    public synchronized void remove() {
-        // No other operation with viewers should be running while removing the nameplate
-        this.lock.writeLock().lock();
-
+    public void remove() {
+        this.removeLock.writeLock().lock();
         try {
             this.removed = true;
-
-            for (UUID uuid : this.viewers) {
-                this.removeViewerInternal(uuid);
-
-                Player player = fn.getServer().getPlayer(uuid);
-                if (player != null) {
-                    this.entity.hide(PacketConsumer.player(player));
-                }
-            }
         } finally {
-            this.lock.writeLock().unlock();
+            this.removeLock.writeLock().unlock();
         }
+
+        for (UUID uuid : this.viewers) {
+            this.fn.getNameplateViewershipTracker().hide(uuid, this.targetId);
+
+            Player player = this.fn.getServer().getPlayer(uuid);
+            if (player != null) {
+                this.entity.hide(PacketConsumer.player(player));
+            }
+        }
+
+        this.viewers.clear();
     }
 
     // Main thread
     public void update(@NotNull Player player) {
-        Component newText = this.nameplateTextFactory.apply(player);
+        if (this.removed) return;
+
+        Component newText = this.fn.getPlugin().createNameplateText(player);
 
         if (this.text.equals(newText))
             return;
 
         this.text = newText;
 
-        if (!this.removed) {
-            this.viewers.removeIf(uuid -> {
-                Player viewer = this.fn.getServer().getPlayer(uuid);
-                if (viewer == null) return true;
-                this.entity.updateText(PacketConsumer.player(viewer), text);
-                return false;
-            });
-        }
+        this.viewers.removeIf(uuid -> {
+            Player viewer = this.fn.getServer().getPlayer(uuid);
+            if (viewer == null) return true;
+            this.entity.updateText(PacketConsumer.player(viewer), text);
+            return false;
+        });
     }
 
     public int getEntityId() {

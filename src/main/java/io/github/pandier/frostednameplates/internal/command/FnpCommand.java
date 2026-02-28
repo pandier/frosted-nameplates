@@ -38,7 +38,7 @@ public final class FnpCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(INFO_PREFIX + "Successfully reloaded the plugin's configuration");
             }
             case "update" -> {
-                plugin.updateNameplates();
+                plugin.getFn().update();
                 sender.sendMessage(INFO_PREFIX + "Updated all nameplates");
             }
             default -> help(sender, label);

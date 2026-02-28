@@ -20,14 +20,12 @@ public class NameplateViewershipTracker {
     public void show(@NotNull UUID player, int target) {
         Set<Integer> ids = this.viewed.get(player);
         if (ids == null) return;
-        // TODO: The set might be removed from a different thread removed by this time.
         ids.add(target);
     }
 
     public void hide(@NotNull UUID player, int target) {
         Set<Integer> ids = this.viewed.get(player);
         if (ids == null) return;
-        // TODO: The set might've been from a different thread removed by this time
         ids.remove(target);
     }
 

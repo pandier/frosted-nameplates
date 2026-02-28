@@ -19,21 +19,12 @@ public class FnpListener implements Listener {
     @EventHandler
     private void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         plugin.getFn().init(event.getPlayer());
-        // TODO: Make it update automatically
-        plugin.updateNameplate(event.getPlayer());
     }
 
     @EventHandler
     private void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         int entityId = event.getPlayer().getEntityId();
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            plugin.getFn().dispose(uuid, entityId);
-        });
+        plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getFn().dispose(uuid, entityId));
     }
 }

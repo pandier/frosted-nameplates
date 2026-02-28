@@ -1,6 +1,6 @@
 package io.github.pandier.frostednameplates.internal;
 
-import io.github.pandier.frostednameplates.api.FrostedNameplates;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FrostedNameplatesImpl implements FrostedNameplates {
+public class FrostedNameplatesImpl {
     private final FrostedNameplatesPlugin plugin;
     private final NameplateViewershipTracker nameplateViewershipTracker = new NameplateViewershipTracker();
     private final Map<Integer, NameplateImpl> nameplates = new ConcurrentHashMap<>();
@@ -21,11 +21,9 @@ public class FrostedNameplatesImpl implements FrostedNameplates {
     }
 
     // Main thread
-    @Override
     public @NotNull NameplateImpl getNameplate(@NotNull Player player) {
-        // TODO: Throw exception if not main thread
         return this.nameplates.computeIfAbsent(player.getEntityId(), (uuid) -> {
-            NameplateImpl nameplate = new NameplateImpl(this, this.plugin::createNameplateText, player.getEntityId());
+            NameplateImpl nameplate = new NameplateImpl(this, player.getEntityId());
             nameplate.update(player);
             return nameplate;
         });
@@ -36,53 +34,47 @@ public class FrostedNameplatesImpl implements FrostedNameplates {
         return this.nameplates.get(entityId);
     }
 
-    // Main thread
     public void update() {
         for (Player player : getServer().getOnlinePlayers()) {
             update(player);
         }
     }
 
-    // Main thread
     public void update(@NotNull Player player) {
         final NameplateImpl nameplate = this.getNameplate(player.getEntityId());
         if (nameplate == null) return;
         nameplate.update(player);
     }
 
-    // Main thread
     public void init() {
         for (Player player : this.getServer().getOnlinePlayers()) {
             this.init(player);
         }
     }
 
-    // Main thread
     public void init(@NotNull Player player) {
         this.nameplateViewershipTracker.track(player.getUniqueId());
         this.getNameplate(player);
     }
 
-    // Main thread
     public void dispose() {
         for (Player player : this.getServer().getOnlinePlayers()) {
             dispose(player.getUniqueId(), player.getEntityId());
         }
     }
 
-    // Main thread
     public void dispose(@NotNull UUID uuid, int entityId) {
+        NameplateImpl nameplate = this.nameplates.remove(entityId);
+        if (nameplate != null) {
+            nameplate.remove();
+        }
+
         Collection<Integer> viewed = this.nameplateViewershipTracker.untrack(uuid);
 
         for (int viewedId : viewed) {
             NameplateImpl viewedNameplate = this.getNameplate(viewedId);
             if (viewedNameplate == null) continue;
-            viewedNameplate.removeViewer(uuid);
-        }
-
-        NameplateImpl nameplate = this.nameplates.remove(entityId);
-        if (nameplate != null) {
-            nameplate.remove();
+            viewedNameplate.disposeViewer(uuid);
         }
     }
 
