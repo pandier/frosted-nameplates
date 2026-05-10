@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.8] - 2026-05-10
+
 ### Added
 
 - Small API
@@ -77,7 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/pandier/frosted-nameplates/compare/v0.1.0-alpha.7...HEAD
+[Unreleased]: https://github.com/pandier/frosted-nameplates/compare/v0.1.0-alpha.8...HEAD
+[0.1.0-alpha.8]: https://github.com/pandier/frosted-nameplates/compare/v0.1.0-alpha.7...v0.1.0-alpha.8
 [0.1.0-alpha.7]: https://github.com/pandier/frosted-nameplates/compare/v0.1.0-alpha.6...v0.1.0-alpha.7
 [0.1.0-alpha.6]: https://github.com/pandier/frosted-nameplates/compare/v0.1.0-alpha.5...v0.1.0-alpha.6
 [0.1.0-alpha.5]: https://github.com/pandier/frosted-nameplates/compare/v0.1.0-alpha.4...v0.1.0-alpha.5
