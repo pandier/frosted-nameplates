@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
@@ -50,11 +49,11 @@ public class FnpChannel implements NameplateSubscriber {
 
         // render the new nameplate
 
-        Vector3d position = packet.getPosition();
+        RenderedNameplateState renderState = this.fn.getNameplateRenderer().create(this.user, targetId, packet.getPosition(), state);
+        this.nameplates.put(targetId, renderState);
 
         event.getTasksAfterSend().add(() -> {
-            RenderedNameplateState renderState = this.fn.getNameplateRenderer().create(this.user, targetId, position, state);
-            this.nameplates.put(targetId, renderState);
+            user.sendPacket(new WrapperPlayServerSetPassengers(renderState.targetId, new int[] { renderState.entityId }));
         });
     }
 

@@ -35,7 +35,6 @@ public class NameplateRenderer {
                 // Setting the background color to 0 will make the text display not display anything, while still showing the custom name
                 new EntityData<>(TEXT_DISPLAY_BACKGROUND_DATA_INDEX, EntityDataTypes.INT, 0)
         )));
-        user.sendPacket(new WrapperPlayServerSetPassengers(renderState.targetId, new int[] { renderState.entityId }));
 
         return renderState;
     }
