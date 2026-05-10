@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Small API
+
 ### Fixed
 
 - Invisibility issues when spectating or when coming into view distance
