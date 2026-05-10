@@ -25,9 +25,7 @@ public final class FnpCommand {
     private static final TextColor SECONDARY_COLOR = TextColor.color(0x1C70ED);
     private static final Component PREFIX = text()
             .color(INFO_COLOR)
-//            .append(text("["))
             .append(text("[❄] ", PRIMARY_COLOR))
-//            .append(text("] "))
             .build();
 
     @SuppressWarnings("UnstableApiUsage")
