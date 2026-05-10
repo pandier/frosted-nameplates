@@ -10,7 +10,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @ApiStatus.Internal
 @NullMarked
@@ -18,10 +17,9 @@ public class NameplateImpl implements Nameplate {
     private final FrostedNameplatesImpl fn;
     private final int targetId;
 
-    private final ReentrantReadWriteLock removeLock = new ReentrantReadWriteLock();
     private final Set<NameplateSubscriber> subscribers = ConcurrentHashMap.newKeySet();
 
-    private NameplateState state = NameplateState.DEFAULT;
+    private volatile NameplateState state = NameplateState.DEFAULT;
     private @Nullable Component textOverride = null;
 
     private volatile boolean removed = false;
@@ -35,39 +33,25 @@ public class NameplateImpl implements Nameplate {
     public @Nullable NameplateState subscribe(NameplateSubscriber subscriber) {
         if (this.removed) return null;
 
-        this.removeLock.readLock().lock();
-        try {
+        synchronized (this) {
             if (this.removed) return null;
 
             this.subscribers.add(subscriber);
 
             return this.state;
-        } finally {
-            this.removeLock.readLock().unlock();
         }
     }
 
     // Thread-safe
     public void unsubscribe(NameplateSubscriber subscriber) {
-        if (this.removed) return;
-
-        this.removeLock.readLock().lock();
-        try {
-            if (this.removed) return;
-
-            this.subscribers.remove(subscriber);
-        } finally {
-            this.removeLock.readLock().unlock();
-        }
+        this.subscribers.remove(subscriber);
     }
 
     // Main thread
     public void remove() {
-        this.removeLock.writeLock().lock();
-        try {
+        synchronized (this) {
+            if (this.removed) return;
             this.removed = true;
-        } finally {
-            this.removeLock.writeLock().unlock();
         }
 
         for (NameplateSubscriber subscriber : this.subscribers) {
