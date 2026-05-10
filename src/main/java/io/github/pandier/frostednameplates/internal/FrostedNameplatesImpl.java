@@ -1,5 +1,6 @@
 package io.github.pandier.frostednameplates.internal;
 
+import io.github.pandier.frostednameplates.api.FrostedNameplates;
 import io.github.pandier.frostednameplates.internal.packet.render.NameplateRenderer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FrostedNameplatesImpl {
+public class FrostedNameplatesImpl implements FrostedNameplates {
     private final FrostedNameplatesPlugin plugin;
     private final NameplateRenderer nameplateRenderer = new NameplateRenderer();
     private final Map<Integer, NameplateImpl> nameplates = new ConcurrentHashMap<>();

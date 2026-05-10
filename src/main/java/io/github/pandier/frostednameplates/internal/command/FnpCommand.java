@@ -1,6 +1,7 @@
 package io.github.pandier.frostednameplates.internal.command;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.pandier.frostednameplates.internal.FrostedNameplatesImpl;
 import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -28,25 +29,25 @@ public final class FnpCommand {
             .build();
 
     @SuppressWarnings("UnstableApiUsage")
-    public static LiteralCommandNode<CommandSourceStack> create(FrostedNameplatesPlugin plugin) {
+    public static LiteralCommandNode<CommandSourceStack> create(FrostedNameplatesImpl fn) {
         return literal("frostednameplates")
                 .requires(source -> source.getSender().hasPermission("frostednameplates.command"))
-                .executes(ctx -> help(plugin, ctx.getSource().getSender()))
+                .executes(ctx -> help(fn, ctx.getSource().getSender()))
                 .then(literal("update")
                         .then(argument("players", ArgumentTypes.players())
                                 .executes(ctx -> {
                                     List<Player> players = ctx.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource());
-                                    return update(plugin, ctx.getSource().getSender(), players);
+                                    return update(fn, ctx.getSource().getSender(), players);
                                 }))
-                        .executes(ctx -> updateAll(plugin, ctx.getSource().getSender())))
+                        .executes(ctx -> updateAll(fn, ctx.getSource().getSender())))
                 .then(literal("reload")
-                        .executes(ctx -> reload(plugin, ctx.getSource().getSender())))
+                        .executes(ctx -> reload(fn, ctx.getSource().getSender())))
                 .build();
     }
 
-    private static int update(FrostedNameplatesPlugin plugin, CommandSender sender, List<Player> players) {
+    private static int update(FrostedNameplatesImpl fn, CommandSender sender, List<Player> players) {
         for (Player player : players) {
-            plugin.getFn().update(player);
+            fn.update(player);
         }
         sender.sendMessage(PREFIX
                 .append(text("Updated nameplate for "))
@@ -55,27 +56,27 @@ public final class FnpCommand {
     }
 
 
-    private static int updateAll(FrostedNameplatesPlugin plugin, CommandSender sender) {
-        plugin.getFn().update();
+    private static int updateAll(FrostedNameplatesImpl fn, CommandSender sender) {
+        fn.update();
         sender.sendMessage(PREFIX.append(text("Updated all nameplates")));
         return 1;
     }
 
-    private static int reload(FrostedNameplatesPlugin plugin, CommandSender sender) {
-        plugin.reloadConfig();
+    private static int reload(FrostedNameplatesImpl fn, CommandSender sender) {
+        fn.getPlugin().reloadConfig();
         sender.sendMessage(PREFIX.append(text("Successfully reloaded the plugin's configuration")));
         return 1;
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private static int help(FrostedNameplatesPlugin plugin, CommandSender sender) {
+    private static int help(FrostedNameplatesImpl fn, CommandSender sender) {
         sender.sendMessage(Component.text()
                 .color(INFO_COLOR)
                 .content("\n ")
                 .append(text("❄ Frosted ", PRIMARY_COLOR))
                 .append(text("Nameplates", SECONDARY_COLOR))
-                .append(text(" v" + plugin.getPluginMeta().getVersion() + "\n"))
-                .append(text(" by " + String.join(", ", plugin.getPluginMeta().getAuthors()) + "\n\n"))
+                .append(text(" v" + fn.getPlugin().getPluginMeta().getVersion() + "\n"))
+                .append(text(" by " + String.join(", ", fn.getPlugin().getPluginMeta().getAuthors()) + "\n\n"))
                 .append(text(" /fnp reload", PRIMARY_COLOR))
                 .append(text(" - Reloads the plugin's configuration\n"))
                 .append(text(" /fnp update [players]", PRIMARY_COLOR))

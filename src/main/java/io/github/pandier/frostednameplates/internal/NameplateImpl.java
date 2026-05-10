@@ -1,17 +1,20 @@
 package io.github.pandier.frostednameplates.internal;
 
+import io.github.pandier.frostednameplates.api.Nameplate;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @ApiStatus.Internal
-public class NameplateImpl {
+@NullMarked
+public class NameplateImpl implements Nameplate {
     private final FrostedNameplatesImpl fn;
     private final int targetId;
 
@@ -19,15 +22,17 @@ public class NameplateImpl {
     private final Set<NameplateSubscriber> subscribers = ConcurrentHashMap.newKeySet();
 
     private NameplateState state = NameplateState.DEFAULT;
+    private @Nullable Component textOverride = null;
+
     private volatile boolean removed = false;
 
-    public NameplateImpl(@NotNull FrostedNameplatesImpl fn, int targetId) {
+    public NameplateImpl(FrostedNameplatesImpl fn, int targetId) {
         this.fn = fn;
         this.targetId = targetId;
     }
 
     // Thread-safe
-    public @Nullable NameplateState subscribe(@NotNull NameplateSubscriber subscriber) {
+    public @Nullable NameplateState subscribe(NameplateSubscriber subscriber) {
         if (this.removed) return null;
 
         this.removeLock.readLock().lock();
@@ -43,7 +48,7 @@ public class NameplateImpl {
     }
 
     // Thread-safe
-    public void unsubscribe(@NotNull NameplateSubscriber subscriber) {
+    public void unsubscribe(NameplateSubscriber subscriber) {
         if (this.removed) return;
 
         this.removeLock.readLock().lock();
@@ -72,8 +77,8 @@ public class NameplateImpl {
     }
 
     // Main thread
-    public void update(@NotNull Player player) {
-        if (this.removed) return;
+    public void update(Player player) {
+        if (this.removed || this.textOverride != null) return;
 
         Component newText = this.fn.getPlugin().createNameplateText(player);
 
@@ -90,5 +95,35 @@ public class NameplateImpl {
         for (NameplateSubscriber subscriber : this.subscribers) {
             subscriber.onNameplateChange(this.targetId, newState);
         }
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        if (this.state.visible() == visible) return;
+
+        this.changeState(this.state.withVisible(visible));
+    }
+
+    @Override
+    public boolean isVisible() {
+        return this.state.visible();
+    }
+
+    @Override
+    public void setTextOverride(@Nullable Component text) {
+        if (Objects.equals(this.textOverride, text)) return;
+
+        this.textOverride = text;
+        this.changeState(this.state.withText(text));
+    }
+
+    @Override
+    public @Nullable Component getTextOverride() {
+        return this.textOverride;
+    }
+
+    @Override
+    public Component getText() {
+        return this.state.text();
     }
 }
