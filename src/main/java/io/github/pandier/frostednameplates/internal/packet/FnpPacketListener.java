@@ -36,7 +36,7 @@ public final class FnpPacketListener extends PacketListenerAbstract {
             case PacketType.Play.Server.SPAWN_ENTITY -> getChannel(event.getUser()).onSpawnEntity(event, new WrapperPlayServerSpawnEntity(event));
             case PacketType.Play.Server.ENTITY_METADATA -> getChannel(event.getUser()).onEntityMetadata(new WrapperPlayServerEntityMetadata(event));
             case PacketType.Play.Server.DESTROY_ENTITIES -> getChannel(event.getUser()).onDestroyEntities(new WrapperPlayServerDestroyEntities(event));
-            case PacketType.Play.Server.SET_PASSENGERS -> getChannel(event.getUser()).onSetPassengers(new WrapperPlayServerSetPassengers(event));
+            case PacketType.Play.Server.SET_PASSENGERS -> getChannel(event.getUser()).onSetPassengers(event, new WrapperPlayServerSetPassengers(event));
             default -> {}
         }
     }

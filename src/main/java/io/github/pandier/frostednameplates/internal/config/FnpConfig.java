@@ -2,10 +2,12 @@ package io.github.pandier.frostednameplates.internal.config;
 
 import io.github.pandier.frostednameplates.internal.formatter.Formatter;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
+@ApiStatus.Internal
 public class FnpConfig {
     private String nameplate;
     private Formatter formatter;

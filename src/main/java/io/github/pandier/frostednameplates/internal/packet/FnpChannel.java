@@ -15,11 +15,13 @@ import io.github.pandier.frostednameplates.internal.NameplateImpl;
 import io.github.pandier.frostednameplates.internal.NameplateState;
 import io.github.pandier.frostednameplates.internal.NameplateSubscriber;
 import io.github.pandier.frostednameplates.internal.packet.render.RenderedNameplateState;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ApiStatus.Internal
 public class FnpChannel implements NameplateSubscriber {
     private final FrostedNameplatesImpl fn;
     private final User user;

@@ -4,8 +4,10 @@ import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.Internal
 public class MiniPlaceholdersIntegration {
     private final boolean enabled;
 

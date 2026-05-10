@@ -3,9 +3,11 @@ package io.github.pandier.frostednameplates.internal.integration;
 import io.github.pandier.frostednameplates.internal.FrostedNameplatesPlugin;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@ApiStatus.Internal
 public class PlaceholderAPIIntegration {
     private final boolean enabled;
 

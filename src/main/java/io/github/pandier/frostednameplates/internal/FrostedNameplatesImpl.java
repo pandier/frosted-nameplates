@@ -4,12 +4,14 @@ import io.github.pandier.frostednameplates.api.FrostedNameplates;
 import io.github.pandier.frostednameplates.internal.packet.render.NameplateRenderer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ApiStatus.Internal
 public class FrostedNameplatesImpl implements FrostedNameplates {
     private final FrostedNameplatesPlugin plugin;
     private final NameplateRenderer nameplateRenderer = new NameplateRenderer();

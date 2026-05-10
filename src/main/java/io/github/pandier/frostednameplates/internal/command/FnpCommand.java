@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import static io.papermc.paper.command.brigadier.Commands.argument;
 import static io.papermc.paper.command.brigadier.Commands.literal;
 import static net.kyori.adventure.text.Component.text;
 
+@ApiStatus.Internal
 public final class FnpCommand {
     private static final TextColor INFO_COLOR = TextColor.color(0xC5DDF9);
     private static final TextColor PRIMARY_COLOR = TextColor.color(0x55A3FC);
