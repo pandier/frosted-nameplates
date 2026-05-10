@@ -20,9 +20,9 @@ import java.util.List;
 
 public final class FrostedNameplatesPlugin extends JavaPlugin implements Listener {
     private final FnpConfig config = new FnpConfig();
-    private final FnpPacketListener packetListener = new FnpPacketListener(this);
-    private FrostedNameplatesImpl fn;
 
+    private FrostedNameplatesImpl fn;
+    private FnpPacketListener packetListener;
     private PlaceholderAPIIntegration placeholderAPIIntegration;
     private MiniPlaceholdersIntegration miniPlaceholdersIntegration;
 
@@ -33,10 +33,11 @@ public final class FrostedNameplatesPlugin extends JavaPlugin implements Listene
         this.fn = new FrostedNameplatesImpl(this);
         this.placeholderAPIIntegration = new PlaceholderAPIIntegration(this);
         this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(this);
+        this.packetListener = new FnpPacketListener(this.fn);
 
         getServer().getPluginManager().registerEvents(new FnpListener(this), this);
 
-        PacketEvents.getAPI().getEventManager().registerListener(packetListener);
+        PacketEvents.getAPI().getEventManager().registerListener(this.packetListener);
 
         this.fn.init();
 
@@ -48,9 +49,14 @@ public final class FrostedNameplatesPlugin extends JavaPlugin implements Listene
 
     @Override
     public void onDisable() {
-        PacketEvents.getAPI().getEventManager().unregisterListener(packetListener);
+        if (this.packetListener != null) {
+            PacketEvents.getAPI().getEventManager().unregisterListener(this.packetListener);
+        }
 
-        this.fn.dispose();
+        if (this.fn != null) {
+            this.fn.dispose();
+            this.fn = null;
+        }
     }
 
     @Override

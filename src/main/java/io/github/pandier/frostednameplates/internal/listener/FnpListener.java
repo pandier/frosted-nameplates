@@ -7,8 +7,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
 public class FnpListener implements Listener {
     private final FrostedNameplatesPlugin plugin;
 
@@ -23,8 +21,7 @@ public class FnpListener implements Listener {
 
     @EventHandler
     private void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-        UUID uuid = event.getPlayer().getUniqueId();
         int entityId = event.getPlayer().getEntityId();
-        plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getFn().dispose(uuid, entityId));
+        plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getFn().dispose(entityId));
     }
 }

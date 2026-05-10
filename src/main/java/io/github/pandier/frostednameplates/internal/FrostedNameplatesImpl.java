@@ -1,19 +1,17 @@
 package io.github.pandier.frostednameplates.internal;
 
-import org.bukkit.Bukkit;
+import io.github.pandier.frostednameplates.internal.packet.render.NameplateRenderer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FrostedNameplatesImpl {
     private final FrostedNameplatesPlugin plugin;
-    private final NameplateViewershipTracker nameplateViewershipTracker = new NameplateViewershipTracker();
+    private final NameplateRenderer nameplateRenderer = new NameplateRenderer();
     private final Map<Integer, NameplateImpl> nameplates = new ConcurrentHashMap<>();
 
     public FrostedNameplatesImpl(@NotNull FrostedNameplatesPlugin plugin) {
@@ -29,7 +27,7 @@ public class FrostedNameplatesImpl {
         });
     }
 
-    // Any thread
+    // Thread-safe
     public @Nullable NameplateImpl getNameplate(int entityId) {
         return this.nameplates.get(entityId);
     }
@@ -53,33 +51,24 @@ public class FrostedNameplatesImpl {
     }
 
     public void init(@NotNull Player player) {
-        this.nameplateViewershipTracker.track(player.getUniqueId());
         this.getNameplate(player);
     }
 
     public void dispose() {
         for (Player player : this.getServer().getOnlinePlayers()) {
-            dispose(player.getUniqueId(), player.getEntityId());
+            dispose(player.getEntityId());
         }
     }
 
-    public void dispose(@NotNull UUID uuid, int entityId) {
+    public void dispose(int entityId) {
         NameplateImpl nameplate = this.nameplates.remove(entityId);
         if (nameplate != null) {
             nameplate.remove();
         }
-
-        Collection<Integer> viewed = this.nameplateViewershipTracker.untrack(uuid);
-
-        for (int viewedId : viewed) {
-            NameplateImpl viewedNameplate = this.getNameplate(viewedId);
-            if (viewedNameplate == null) continue;
-            viewedNameplate.disposeViewer(uuid);
-        }
     }
 
-    public @NotNull NameplateViewershipTracker getNameplateViewershipTracker() {
-        return this.nameplateViewershipTracker;
+    public @NotNull NameplateRenderer getNameplateRenderer() {
+        return nameplateRenderer;
     }
 
     public @NotNull Server getServer() {
