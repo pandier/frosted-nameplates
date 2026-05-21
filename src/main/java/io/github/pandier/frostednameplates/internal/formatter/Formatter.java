@@ -18,14 +18,27 @@ public enum Formatter {
     MINIMESSAGE {
         @Override
         public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
-            final TagResolver tagResolver = plugin.getMiniPlaceholdersIntegration().tagResolver(player);
-            return MiniMessage.miniMessage().deserialize(text.replace('§', '?'), tagResolver);
+            return format(text, player, player, plugin);
+        }
+
+        @Override
+        public @NotNull Component format(@NotNull String text, @NotNull Player viewer, @NotNull Player target, @NotNull FrostedNameplatesPlugin plugin) {
+            final TagResolver tagResolver = TagResolver.resolver(
+                    plugin.getMiniPlaceholdersIntegration().tagResolver(target),
+                    plugin.getMiniPlaceholdersIntegration().relationalTagResolver(viewer, target)
+            );
+            return MiniMessage.miniMessage().deserialize(text.replace('\u00A7', '?'), tagResolver);
         }
     },
     LEGACY {
         @Override
         public @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin) {
-            return getLegacySerializer().deserialize(text.replace('&', '§'));
+            return getLegacySerializer().deserialize(text.replace('&', '\u00A7'));
+        }
+
+        @Override
+        public @NotNull Component format(@NotNull String text, @NotNull Player viewer, @NotNull Player target, @NotNull FrostedNameplatesPlugin plugin) {
+            return format(text, target, plugin);
         }
     };
 
@@ -48,4 +61,6 @@ public enum Formatter {
     }
 
     public abstract @NotNull Component format(@NotNull String text, @NotNull Player player, @NotNull FrostedNameplatesPlugin plugin);
+
+    public abstract @NotNull Component format(@NotNull String text, @NotNull Player viewer, @NotNull Player target, @NotNull FrostedNameplatesPlugin plugin);
 }

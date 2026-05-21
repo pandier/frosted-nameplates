@@ -34,6 +34,7 @@ The configuration can be found under `config/FrostedNameplates/config.yml` and c
 ```yml
 # The customized nameplate shown above the player's head.
 # Supports placeholders from PlaceholderAPI and MiniPlaceholders (requires minimessage formatter).
+# Relational placeholders are resolved for the viewer looking at the target player's nameplate.
 #
 # Default: '%player_name%'
 nameplate: '%player_name%'

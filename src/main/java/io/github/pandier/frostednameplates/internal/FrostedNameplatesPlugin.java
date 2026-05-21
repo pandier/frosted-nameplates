@@ -93,8 +93,12 @@ public final class FrostedNameplatesPlugin extends JavaPlugin implements Listene
     }
 
     public Component createNameplateText(Player player) {
-        String text = placeholderAPIIntegration.setPlaceholders(player, this.config.getNameplate());
-        return config.getFormatter().format(text, player, this);
+        return createNameplateText(player, player);
+    }
+
+    public Component createNameplateText(Player viewer, Player target) {
+        String text = placeholderAPIIntegration.setPlaceholders(viewer, target, this.config.getNameplate());
+        return config.getFormatter().format(text, viewer, target, this);
     }
 
     public MiniPlaceholdersIntegration getMiniPlaceholdersIntegration() {

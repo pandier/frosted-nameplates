@@ -10,9 +10,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.pandier.frostednameplates.internal.NameplateState;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @ApiStatus.Internal
@@ -22,15 +24,16 @@ public class NameplateRenderer {
     private static final int CUSTOM_NAME_VISIBLE_DATA_INDEX = 3;
     private static final int TEXT_DISPLAY_BACKGROUND_DATA_INDEX = 25;
 
-    public RenderedNameplateState create(User user, int targetId, Vector3d position, NameplateState state) {
+    public RenderedNameplateState create(User user, int targetId, Vector3d position, NameplateState state, Component text) {
         RenderedNameplateState renderState = new RenderedNameplateState(targetId);
+        renderState.text = text;
         renderState.visible = state.visible();
 
         user.sendPacket(new WrapperPlayServerSpawnEntity(renderState.entityId, Optional.of(renderState.entityUuid), EntityTypes.TEXT_DISPLAY,
                 position.add(0.0, 1.8, 0.0), 0f, 0f, 0f, 0, Optional.of(new Vector3d())));
         user.sendPacket(new WrapperPlayServerEntityMetadata(renderState.entityId, List.of(
                 new EntityData<>(FLAGS_DATA_INDEX, EntityDataTypes.BYTE, getFlags(false)),
-                new EntityData<>(CUSTOM_NAME_DATA_INDEX, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(state.text())),
+                new EntityData<>(CUSTOM_NAME_DATA_INDEX, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)),
                 new EntityData<>(CUSTOM_NAME_VISIBLE_DATA_INDEX, EntityDataTypes.BOOLEAN, renderState.isVisible()),
                 // Setting the background color to 0 will make the text display not display anything, while still showing the custom name
                 new EntityData<>(TEXT_DISPLAY_BACKGROUND_DATA_INDEX, EntityDataTypes.INT, 0)
@@ -47,10 +50,14 @@ public class NameplateRenderer {
         )));
     }
 
-    public void update(User user, RenderedNameplateState renderState, NameplateState state) {
+    public void update(User user, RenderedNameplateState renderState, NameplateState state, Component text) {
+        boolean visibleChanged = renderState.visible != state.visible();
+        if (!visibleChanged && Objects.equals(renderState.text, text)) return;
+
+        renderState.text = text;
         renderState.visible = state.visible();
         user.sendPacket(new WrapperPlayServerEntityMetadata(renderState.entityId, List.of(
-                new EntityData<>(CUSTOM_NAME_DATA_INDEX, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(state.text())),
+                new EntityData<>(CUSTOM_NAME_DATA_INDEX, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)),
                 new EntityData<>(CUSTOM_NAME_VISIBLE_DATA_INDEX, EntityDataTypes.BOOLEAN, renderState.isVisible())
         )));
     }

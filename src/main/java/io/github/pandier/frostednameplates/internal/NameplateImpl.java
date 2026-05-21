@@ -64,12 +64,9 @@ public class NameplateImpl implements Nameplate {
     public void update(Player player) {
         if (this.removed || this.textOverride != null) return;
 
-        Component newText = this.fn.getPlugin().createNameplateText(player);
+        Component newText = this.fn.getPlugin().createNameplateText(player, player);
 
-        if (this.state.text().equals(newText))
-            return;
-
-        this.changeState(this.state.withText(newText));
+        this.changeState(this.state.withText(newText, false));
     }
 
     // Main thread
@@ -98,7 +95,7 @@ public class NameplateImpl implements Nameplate {
         if (Objects.equals(this.textOverride, text)) return;
 
         this.textOverride = text;
-        this.changeState(this.state.withText(text));
+        this.changeState(this.state.withText(text == null ? Component.empty() : text, text != null));
     }
 
     @Override

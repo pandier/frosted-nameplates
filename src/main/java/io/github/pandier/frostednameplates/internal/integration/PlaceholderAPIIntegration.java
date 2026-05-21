@@ -19,4 +19,14 @@ public class PlaceholderAPIIntegration {
         if (!enabled) return text;
         return PlaceholderAPI.setPlaceholders(player, text);
     }
+
+    public @NotNull String setPlaceholders(@Nullable Player viewer, @NotNull Player target, @NotNull String text) {
+        if (!enabled) return text;
+
+        String result = PlaceholderAPI.setPlaceholders(target, text);
+        if (viewer != null) {
+            result = PlaceholderAPI.setRelationalPlaceholders(viewer, target, result);
+        }
+        return result;
+    }
 }

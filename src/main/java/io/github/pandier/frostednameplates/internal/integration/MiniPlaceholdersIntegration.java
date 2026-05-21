@@ -19,4 +19,9 @@ public class MiniPlaceholdersIntegration {
         if (!enabled) return TagResolver.empty();
         return MiniPlaceholders.getAudienceGlobalPlaceholders(audience);
     }
+
+    public @NotNull TagResolver relationalTagResolver(@NotNull Audience viewer, @NotNull Audience target) {
+        if (!enabled) return TagResolver.empty();
+        return MiniPlaceholders.getRelationalGlobalPlaceholders(viewer, target);
+    }
 }

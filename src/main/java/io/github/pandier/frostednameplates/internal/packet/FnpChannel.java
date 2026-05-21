@@ -14,6 +14,8 @@ import io.github.pandier.frostednameplates.internal.NameplateImpl;
 import io.github.pandier.frostednameplates.internal.NameplateState;
 import io.github.pandier.frostednameplates.internal.NameplateSubscriber;
 import io.github.pandier.frostednameplates.internal.packet.render.RenderedNameplateState;
+import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
@@ -49,7 +51,7 @@ public class FnpChannel implements NameplateSubscriber {
 
         // render the new nameplate
 
-        RenderedNameplateState renderState = this.fn.getNameplateRenderer().create(this.user, targetId, packet.getPosition(), state);
+        RenderedNameplateState renderState = this.fn.getNameplateRenderer().create(this.user, targetId, packet.getPosition(), state, renderText(targetId, state));
         this.nameplates.put(targetId, renderState);
 
         event.getTasksAfterSend().add(() -> {
@@ -132,7 +134,7 @@ public class FnpChannel implements NameplateSubscriber {
             RenderedNameplateState renderState = this.nameplates.get(id);
             if (renderState == null) return;
 
-            this.fn.getNameplateRenderer().update(this.user, renderState, newState);
+            this.fn.getNameplateRenderer().update(this.user, renderState, newState, renderText(id, newState));
 
             this.fn.getPlugin().getSLF4JLogger().debug("User {} received nameplate update of {}", user.getUUID(), id);
         });
@@ -157,5 +159,19 @@ public class FnpChannel implements NameplateSubscriber {
 
     private void execute(Runnable runnable) {
         PacketEvents.getAPI().getNettyManager().getChannelOperator().runInEventLoop(this.user.getChannel(), runnable);
+    }
+
+    private Component renderText(int targetId, NameplateState state) {
+        if (state.textOverridden()) return state.text();
+
+        Player viewer = this.fn.getServer().getPlayer(this.user.getUUID());
+        Player target = this.fn.getServer().getOnlinePlayers().stream()
+                .filter(player -> player.getEntityId() == targetId)
+                .findFirst()
+                .orElse(null);
+
+        if (viewer == null || target == null) return state.text();
+
+        return this.fn.getPlugin().createNameplateText(viewer, target);
     }
 }
