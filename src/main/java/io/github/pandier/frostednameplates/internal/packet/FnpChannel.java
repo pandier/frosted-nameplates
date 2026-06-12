@@ -47,6 +47,11 @@ public class FnpChannel implements NameplateSubscriber {
 
         this.fn.getPlugin().getSLF4JLogger().debug("User {} subscribed to nameplate of {}", user.getUUID(), targetId);
 
+        // make sure that the nameplate doesn't already exist
+        // this is just to avoid some bugs when doing manual packets
+
+        this.removeNameplate(targetId);
+
         // render the new nameplate
 
         RenderedNameplateState renderState = this.fn.getNameplateRenderer().create(this.user, targetId, packet.getPosition(), state);
